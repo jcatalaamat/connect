@@ -55,9 +55,10 @@ export function PractitionerDashboardScreen() {
     stripeStatus?.chargesEnabled
 
   return (
-    <YStack flex={1} padding="$4" gap="$6">
-      {/* Header */}
-      <XStack justifyContent="space-between" alignItems="center">
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <YStack flex={1} padding="$4" gap="$6">
+        {/* Header */}
+        <XStack justifyContent="space-between" alignItems="center">
         <YStack>
           <H1 size="$8">Dashboard</H1>
           <Text theme="alt2">{profile.business_name}</Text>
@@ -221,8 +222,9 @@ export function PractitionerDashboardScreen() {
               View
             </Button>
           </XStack>
-        </Card>
-      )}
-    </YStack>
+          </Card>
+        )}
+      </YStack>
+    </ScrollView>
   )
 }
