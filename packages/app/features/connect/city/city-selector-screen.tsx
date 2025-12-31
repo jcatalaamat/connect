@@ -98,10 +98,13 @@ export function CitySelectorScreen() {
 
   if (error) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
-        <Text color="$red10">Failed to load cities</Text>
-        <Text size="$2" theme="alt2">
+      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$3">
+        <Text color="$red10" fontWeight="600">Failed to load cities</Text>
+        <Text size="$2" theme="alt2" textAlign="center">
           {error.message}
+        </Text>
+        <Text size="$2" theme="alt2" textAlign="center">
+          Make sure the Next.js server is running (yarn next:dev)
         </Text>
       </YStack>
     )
