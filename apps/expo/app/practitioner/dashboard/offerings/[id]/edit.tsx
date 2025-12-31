@@ -1,5 +1,5 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { OfferingFormScreen } from 'app/features/connect/practitioner-dashboard'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function EditOfferingPage() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -8,5 +8,10 @@ export default function EditOfferingPage() {
     return null
   }
 
-  return <OfferingFormScreen offeringId={id} />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Edit Offering', headerBackTitle: 'Back' }} />
+      <OfferingFormScreen offeringId={id} />
+    </>
+  )
 }

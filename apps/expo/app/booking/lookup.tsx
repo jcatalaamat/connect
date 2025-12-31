@@ -1,8 +1,13 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { BookingLookupScreen } from 'app/features/connect/booking'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function LookupPage() {
   const { code } = useLocalSearchParams<{ code?: string }>()
 
-  return <BookingLookupScreen initialCode={code} />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Find Booking', headerBackTitle: 'Back' }} />
+      <BookingLookupScreen initialCode={code} />
+    </>
+  )
 }

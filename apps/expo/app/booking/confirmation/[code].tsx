@@ -1,5 +1,5 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { BookingConfirmationScreen } from 'app/features/connect/booking'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function ConfirmationPage() {
   const { code, email } = useLocalSearchParams<{ code: string; email?: string }>()
@@ -8,5 +8,10 @@ export default function ConfirmationPage() {
     return null
   }
 
-  return <BookingConfirmationScreen confirmationCode={code} email={email} />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Booking Confirmed', headerBackTitle: 'Back' }} />
+      <BookingConfirmationScreen confirmationCode={code} email={email} />
+    </>
+  )
 }

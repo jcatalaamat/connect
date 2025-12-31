@@ -1,5 +1,5 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { BookingFormScreen } from 'app/features/connect/booking'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function BookingPage() {
   const { offeringId, slotId, eventDateId } = useLocalSearchParams<{
@@ -13,10 +13,13 @@ export default function BookingPage() {
   }
 
   return (
-    <BookingFormScreen
-      offeringId={offeringId}
-      slotId={slotId}
-      eventDateId={eventDateId}
-    />
+    <>
+      <Stack.Screen options={{ title: 'Book', headerBackTitle: 'Back' }} />
+      <BookingFormScreen
+        offeringId={offeringId}
+        slotId={slotId}
+        eventDateId={eventDateId}
+      />
+    </>
   )
 }

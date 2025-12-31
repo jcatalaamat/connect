@@ -1,3 +1,4 @@
+import { ScrollView } from 'react-native'
 import { YStack, XStack, H1, H2, Text, Button, Spinner, Card, Paragraph } from '@my/ui'
 import { useRouter, useLink } from 'solito/navigation'
 import { api } from 'app/utils/api'
@@ -54,14 +55,15 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
   }
 
   return (
-    <YStack flex={1} padding="$4" gap="$6">
-      {/* Header */}
-      <YStack gap="$2">
-        <Text size="$2" theme="alt2" fontWeight="600">
-          CITY ADMIN
-        </Text>
-        <H1 size="$8">{city?.name}</H1>
-      </YStack>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <YStack flex={1} padding="$4" gap="$6">
+        {/* Header */}
+        <YStack gap="$2">
+          <Text size="$2" theme="alt2" fontWeight="600">
+            CITY ADMIN
+          </Text>
+          <H1 size="$8">{city?.name}</H1>
+        </YStack>
 
       {/* Stats Cards */}
       {loadingStats ? (
@@ -207,7 +209,8 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
             </XStack>
           </XStack>
         </YStack>
-      </Card>
-    </YStack>
+        </Card>
+      </YStack>
+    </ScrollView>
   )
 }

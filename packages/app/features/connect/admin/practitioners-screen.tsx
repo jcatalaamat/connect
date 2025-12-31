@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ScrollView } from 'react-native'
 import {
   YStack,
   XStack,
@@ -15,10 +16,8 @@ import {
   Theme,
 } from '@my/ui'
 import { StatusBadge } from '@my/ui'
-import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
 import {
-  ArrowLeft,
   Check,
   X,
   AlertTriangle,
@@ -39,7 +38,6 @@ const statusFilters: { value: PractitionerStatus | 'all'; label: string }[] = [
 ]
 
 export function AdminPractitionersScreen({ citySlug }: { citySlug: string }) {
-  const router = useRouter()
   const utils = api.useUtils()
 
   const [statusFilter, setStatusFilter] = useState<PractitionerStatus | 'all'>('pending')
@@ -131,24 +129,9 @@ export function AdminPractitionersScreen({ citySlug }: { citySlug: string }) {
   }
 
   return (
-    <YStack flex={1} padding="$4" gap="$5">
-      {/* Header */}
-      <XStack alignItems="center" gap="$3">
-        <Button
-          icon={ArrowLeft}
-          circular
-          variant="outlined"
-          onPress={() => router.push(`/admin/${citySlug}`)}
-        />
-        <YStack flex={1}>
-          <H1 size="$7">Practitioners</H1>
-          <Text size="$2" theme="alt2">
-            {city?.name}
-          </Text>
-        </YStack>
-      </XStack>
-
-      {/* Status Filters */}
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <YStack flex={1} padding="$4" gap="$5">
+        {/* Status Filters */}
       <XStack gap="$2" flexWrap="wrap">
         {statusFilters.map((filter) => (
           <Button
@@ -442,8 +425,9 @@ export function AdminPractitionersScreen({ citySlug }: { citySlug: string }) {
           >
             Next
           </Button>
-        </XStack>
-      )}
-    </YStack>
+          </XStack>
+        )}
+      </YStack>
+    </ScrollView>
   )
 }

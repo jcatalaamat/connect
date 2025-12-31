@@ -1,5 +1,11 @@
+import { Stack } from 'expo-router'
 import { OfferingFormScreen } from 'app/features/connect/practitioner-dashboard'
 
 export default function NewOfferingPage() {
-  return <OfferingFormScreen />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'New Offering', headerBackTitle: 'Back' }} />
+      <OfferingFormScreen />
+    </>
+  )
 }

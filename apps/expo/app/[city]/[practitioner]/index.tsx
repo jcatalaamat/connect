@@ -1,5 +1,5 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { PractitionerDetailScreen } from 'app/features/connect/practitioners'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function PractitionerDetailPage() {
   const { city, practitioner } = useLocalSearchParams<{ city: string; practitioner: string }>()
@@ -8,5 +8,10 @@ export default function PractitionerDetailPage() {
     return null
   }
 
-  return <PractitionerDetailScreen citySlug={city} practitionerSlug={practitioner} />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Practitioner', headerBackTitle: 'Back' }} />
+      <PractitionerDetailScreen citySlug={city} practitionerSlug={practitioner} />
+    </>
+  )
 }

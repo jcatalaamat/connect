@@ -1,5 +1,5 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { OfferingDetailScreen } from 'app/features/connect/practitioner-dashboard'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function OfferingDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -8,5 +8,10 @@ export default function OfferingDetailPage() {
     return null
   }
 
-  return <OfferingDetailScreen offeringId={id} />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Offering Details', headerBackTitle: 'Back' }} />
+      <OfferingDetailScreen offeringId={id} />
+    </>
+  )
 }

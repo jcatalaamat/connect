@@ -1,14 +1,13 @@
 import { useState } from 'react'
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import {
   YStack,
   XStack,
-  H1,
   H2,
   Text,
   Button,
   Spinner,
   Card,
-  Paragraph,
   Input,
   Label,
   Separator,
@@ -17,7 +16,7 @@ import {
 import { PriceDisplay } from '@my/ui'
 import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
-import { ArrowLeft, CreditCard, Calendar, Clock, MapPin, Users } from '@tamagui/lucide-icons'
+import { CreditCard, Calendar, Clock, MapPin } from '@tamagui/lucide-icons'
 
 type FormData = {
   customerName: string
@@ -106,8 +105,7 @@ export function BookingFormScreen({
 
   if (!offering) {
     return (
-      <YStack flex={1} padding="$4" gap="$4">
-        <Button icon={ArrowLeft} circular variant="outlined" onPress={() => router.back()} />
+      <YStack flex={1} padding="$4" gap="$4" justifyContent="center" alignItems="center">
         <Text>Offering not found</Text>
       </YStack>
     )
@@ -138,14 +136,13 @@ export function BookingFormScreen({
   const totalAmount = offering.price_cents * formData.spots
 
   return (
-    <YStack flex={1} padding="$4" gap="$6">
-      {/* Header */}
-      <XStack alignItems="center" gap="$3">
-        <Button icon={ArrowLeft} circular variant="outlined" onPress={() => router.back()} />
-        <H1 size="$7">Complete Booking</H1>
-      </XStack>
-
-      {/* Booking Summary */}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <YStack flex={1} padding="$4" gap="$6">
+          {/* Booking Summary */}
       <Card bordered padding="$4">
         <YStack gap="$3">
           <Text fontWeight="600" size="$2" theme="alt2">
@@ -323,8 +320,10 @@ export function BookingFormScreen({
           <Text size="$2" theme="alt2" textAlign="center">
             You'll be redirected to our secure payment provider
           </Text>
+          </YStack>
+        </Card>
         </YStack>
-      </Card>
-    </YStack>
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import {
   YStack,
   XStack,
-  H1,
   H2,
   Text,
   Button,
@@ -17,7 +17,7 @@ import {
 } from '@my/ui'
 import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
-import { ArrowLeft, Save, Trash2 } from '@tamagui/lucide-icons'
+import { Save, Trash2 } from '@tamagui/lucide-icons'
 
 type OfferingType = 'session' | 'event'
 type LocationType = 'in_person' | 'virtual' | 'hybrid'
@@ -194,14 +194,13 @@ export function OfferingFormScreen({ offeringId }: { offeringId?: string }) {
   }
 
   return (
-    <YStack flex={1} padding="$4" gap="$6">
-      {/* Header */}
-      <XStack alignItems="center" gap="$3">
-        <Button icon={ArrowLeft} circular variant="outlined" onPress={() => router.back()} />
-        <H1 size="$8">{isEditing ? 'Edit Offering' : 'New Offering'}</H1>
-      </XStack>
-
-      {/* Error Display */}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <YStack flex={1} padding="$4" gap="$6">
+          {/* Error Display */}
       {error && (
         <Card bordered backgroundColor="$red2" padding="$3">
           <Text color="$red10">{error}</Text>
@@ -469,8 +468,10 @@ export function OfferingFormScreen({ offeringId }: { offeringId?: string }) {
           >
             {isMutating ? <Spinner size="small" /> : isEditing ? 'Save Changes' : 'Create Offering'}
           </Button>
+          </XStack>
         </XStack>
-      </XStack>
-    </YStack>
+        </YStack>
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }

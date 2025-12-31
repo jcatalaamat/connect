@@ -1,9 +1,9 @@
+import { ScrollView } from 'react-native'
 import { YStack, XStack, H1, H2, Text, Button, Spinner, Card } from '@my/ui'
 import { useRouter, useLink } from 'solito/navigation'
 import { api } from 'app/utils/api'
 import {
   Check,
-  AlertCircle,
   Clock,
   Calendar,
   DollarSign,

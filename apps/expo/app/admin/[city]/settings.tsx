@@ -1,5 +1,5 @@
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { AdminSettingsScreen } from 'app/features/connect/admin'
-import { useLocalSearchParams } from 'expo-router'
 
 export default function AdminSettingsPage() {
   const { city } = useLocalSearchParams<{ city: string }>()
@@ -8,5 +8,10 @@ export default function AdminSettingsPage() {
     return null
   }
 
-  return <AdminSettingsScreen citySlug={city} />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'City Settings', headerBackTitle: 'Back' }} />
+      <AdminSettingsScreen citySlug={city} />
+    </>
+  )
 }
