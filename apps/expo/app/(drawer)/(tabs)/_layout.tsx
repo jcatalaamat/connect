@@ -1,16 +1,18 @@
 import { useTheme, Button } from '@my/ui'
 import { DrawerActions } from '@react-navigation/native'
 import { Home, Menu, Calendar, LayoutDashboard, Shield, User } from '@tamagui/lucide-icons'
-import { router, Stack, Tabs, useNavigation, usePathname } from 'expo-router'
+import { Stack, Tabs, useNavigation } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useUserRole } from 'app/hooks'
 
 export default function Layout() {
   const { accentColor } = useTheme()
   const navigation = useNavigation()
-  const pathname = usePathname()
   const insets = useSafeAreaInsets()
-  const { isPractitioner, isAdmin, adminCitySlug, isLoading } = useUserRole()
+  const { isPractitioner, isAdmin, adminCitySlug } = useUserRole()
+
+  // Show admin tab if user is admin for any city
+  const showAdminTab = isAdmin && !!adminCitySlug
 
   return (
     <>
@@ -36,6 +38,7 @@ export default function Layout() {
         }}
       />
       <Tabs
+        key={`tabs-${isPractitioner}-${showAdminTab}`}
         screenOptions={{
           tabBarShowLabel: true,
           headerTintColor: accentColor.val,
@@ -55,7 +58,6 @@ export default function Layout() {
         {/* Browse Tab - Always visible */}
         <Tabs.Screen
           name="index"
-          key="index"
           options={{
             headerShown: false,
             title: 'Browse',
@@ -68,7 +70,6 @@ export default function Layout() {
         {/* Bookings Tab - Always visible */}
         <Tabs.Screen
           name="bookings"
-          key="bookings"
           options={{
             headerShown: false,
             title: 'Bookings',
@@ -81,7 +82,6 @@ export default function Layout() {
         {/* Dashboard Tab - Practitioners only */}
         <Tabs.Screen
           name="dashboard"
-          key="dashboard"
           options={{
             headerShown: false,
             title: 'Dashboard',
@@ -95,11 +95,10 @@ export default function Layout() {
         {/* Admin Tab - Admins only */}
         <Tabs.Screen
           name="admin"
-          key="admin"
           options={{
             headerShown: false,
             title: 'Admin',
-            href: isAdmin ? '/admin' : null,
+            href: showAdminTab ? '/admin' : null,
             tabBarIcon: ({ size, focused }) => (
               <Shield color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
             ),
@@ -109,7 +108,6 @@ export default function Layout() {
         {/* Profile Tab - Always visible */}
         <Tabs.Screen
           name="profile"
-          key="profile"
           options={{
             headerShown: false,
             title: 'Profile',
