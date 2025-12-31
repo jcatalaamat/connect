@@ -12,7 +12,7 @@ import { useLink } from 'solito/link'
 export function DrawerMenu(props) {
   const { profile, avatarUrl, session } = useUser()
   const { city, citySlug, clearCity } = useCity()
-  const { isPractitioner, isAdmin, isAuthenticated } = useUserRole()
+  const { isPractitioner, isAdmin, isAuthenticated, adminCitySlug } = useUserRole()
   const supabase = useSupabase()
   const name = profile?.name
   const insets = useSafeAreaInsets()
@@ -87,11 +87,11 @@ export function DrawerMenu(props) {
             )}
 
             {/* Admin Section */}
-            {isAdmin && citySlug && (
+            {isAdmin && adminCitySlug && (
               <Settings.Group>
                 <Settings.Item
                   icon={Shield}
-                  {...useLink({ href: `/admin/${citySlug}` })}
+                  {...useLink({ href: `/admin/${adminCitySlug}` })}
                   accentTheme="orange"
                 >
                   City Admin

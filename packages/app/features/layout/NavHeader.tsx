@@ -1,6 +1,6 @@
 import { XStack, YStack, H3, Button, Text, Sheet, Separator, Anchor } from '@my/ui'
 import { useRouter } from 'solito/navigation'
-import { Menu, X, Home, Calendar, User, LayoutDashboard, Shield, LogIn } from '@tamagui/lucide-icons'
+import { Menu, X, Home, Calendar, User, LayoutDashboard, Shield, LogIn, UserPlus } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { useCity } from 'app/provider/city'
@@ -18,7 +18,7 @@ export function NavHeader() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const { city, citySlug, clearCity } = useCity()
-  const { isPractitioner, isAdmin, isAuthenticated } = useUserRole()
+  const { isPractitioner, isAdmin, isAuthenticated, adminCitySlug } = useUserRole()
   const { user } = useUser()
 
   const navItems: NavItem[] = [
@@ -35,6 +35,12 @@ export function NavHeader() {
       show: true,
     },
     {
+      label: 'Become a Practitioner',
+      href: '/practitioner/onboarding',
+      icon: <UserPlus size={18} />,
+      show: isAuthenticated && !isPractitioner,
+    },
+    {
       label: 'Dashboard',
       href: '/practitioner/dashboard',
       icon: <LayoutDashboard size={18} />,
@@ -42,9 +48,9 @@ export function NavHeader() {
     },
     {
       label: 'Admin',
-      href: citySlug ? `/admin/${citySlug}` : '/admin',
+      href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin',
       icon: <Shield size={18} />,
-      show: isAdmin,
+      show: isAdmin && !!adminCitySlug,
     },
     {
       label: isAuthenticated ? 'Profile' : 'Sign In',

@@ -11,6 +11,7 @@ interface UseUserRoleResult {
   isAdmin: boolean
   isAuthenticated: boolean
   practitionerProfile: ReturnType<typeof api.practitioners.getMyProfile.useQuery>['data']
+  adminCitySlug: string | null
 }
 
 export function useUserRole(): UseUserRoleResult {
@@ -26,20 +27,18 @@ export function useUserRole(): UseUserRoleResult {
     enabled: isAuthenticated,
   })
 
-  // Check if user is a city admin
+  // Check if user is admin for ANY city (not just selected)
   const {
-    data: adminStatus,
+    data: adminCities,
     isLoading: adminLoading,
-  } = api.cities.isAdmin.useQuery(
-    { cityId: city?.id ?? '' },
-    {
-      enabled: isAuthenticated && !!city?.id,
-    }
-  )
+  } = api.admin.getAdminCities.useQuery(undefined, {
+    enabled: isAuthenticated,
+  })
 
-  const isLoading = isAuthenticated && (practitionerLoading || (!!city?.id && adminLoading))
+  const isLoading = isAuthenticated && (practitionerLoading || adminLoading)
   const isPractitioner = !!practitionerProfile && practitionerProfile.status === 'approved'
-  const isAdmin = !!adminStatus?.isAdmin
+  const isAdmin = (adminCities?.length ?? 0) > 0
+  const adminCitySlug = (adminCities?.[0]?.cities as any)?.slug ?? null
 
   let role: UserRole = 'guest'
   if (isAuthenticated) {
@@ -55,5 +54,6 @@ export function useUserRole(): UseUserRoleResult {
     isAdmin,
     isAuthenticated,
     practitionerProfile,
+    adminCitySlug,
   }
 }
