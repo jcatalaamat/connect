@@ -16,9 +16,19 @@ export const createTrpcClient = () =>
         async headers() {
           const headers = new Map<string, string>()
           headers.set('x-trpc-source', 'expo-react')
-          const session = (await supabase.auth.getSession()).data.session
 
-          // Manually add the auth name as the backend uses cookies to authenticate users
+          const { data, error } = await supabase.auth.getSession()
+          const session = data.session
+
+          if (__DEV__) {
+            console.log('[tRPC] Session check:', {
+              hasSession: !!session,
+              hasAccessToken: !!session?.access_token,
+              error: error?.message,
+            })
+          }
+
+          // Manually add the auth header for native clients
           // This allows mobile to authenticate via Supabase
           if (session?.access_token) {
             headers.set('Authorization', `Bearer ${session.access_token}`)
