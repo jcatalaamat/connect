@@ -1,6 +1,8 @@
 import { YStack, XStack, H1, H2, Text, Button, Spinner, Image } from '@my/ui'
-import { useLink } from 'solito/navigation'
+import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
+import { useCity } from 'app/provider/city'
+import { Platform } from 'react-native'
 
 interface CityHomeScreenProps {
   citySlug: string
@@ -13,8 +15,19 @@ export function CityHomeScreen({ citySlug }: CityHomeScreenProps) {
     error,
   } = api.cities.getBySlug.useQuery({ slug: citySlug })
 
-  const changeCityLink = useLink({ href: '/' })
-  const browsePractitionersLink = useLink({ href: `/${citySlug}/practitioners` })
+  const { clearCity } = useCity()
+  const router = useRouter()
+
+  const handleChangeCity = () => {
+    clearCity()
+    if (Platform.OS === 'web') {
+      router.push('/')
+    }
+  }
+
+  const handleBrowsePractitioners = () => {
+    router.push(`/${citySlug}/practitioners`)
+  }
 
   if (isLoading) {
     return (
@@ -29,7 +42,7 @@ export function CityHomeScreen({ citySlug }: CityHomeScreenProps) {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$4">
         <Text color="$red10">City not found</Text>
-        <Button {...changeCityLink}>Choose a different city</Button>
+        <Button onPress={handleChangeCity}>Choose a different city</Button>
       </YStack>
     )
   }
@@ -95,7 +108,7 @@ export function CityHomeScreen({ citySlug }: CityHomeScreenProps) {
           <Button
             size="$5"
             theme="active"
-            {...browsePractitionersLink}
+            onPress={handleBrowsePractitioners}
           >
             Browse Practitioners
           </Button>
@@ -103,7 +116,7 @@ export function CityHomeScreen({ citySlug }: CityHomeScreenProps) {
           <Button
             size="$4"
             variant="outlined"
-            {...changeCityLink}
+            onPress={handleChangeCity}
           >
             Change City
           </Button>

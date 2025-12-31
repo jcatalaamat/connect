@@ -1,26 +1,29 @@
-import { useEffect } from 'react'
 import { YStack, XStack, H1, H2, Text, Card, Spinner, Image } from '@my/ui'
-import { useLink } from 'solito/navigation'
 import { api } from 'app/utils/api'
+import { useCity } from 'app/provider/city'
+import { Platform } from 'react-native'
+import { useRouter } from 'solito/navigation'
 
 // City card component
 function CityCard({
+  id,
   name,
   slug,
   country,
   coverImageUrl,
   description,
   practitionerCount,
+  onSelect,
 }: {
+  id: string
   name: string
   slug: string
   country: string
   coverImageUrl?: string | null
   description?: string | null
   practitionerCount?: number
+  onSelect: () => void
 }) {
-  const link = useLink({ href: `/${slug}` })
-
   return (
     <Card
       elevate
@@ -29,11 +32,11 @@ function CityCard({
       scale={0.98}
       hoverStyle={{ scale: 1 }}
       pressStyle={{ scale: 0.96 }}
-      {...link}
+      onPress={onSelect}
       cursor="pointer"
+      width={320}
+      minHeight={180}
       overflow="hidden"
-      width="100%"
-      maxWidth={400}
     >
       {coverImageUrl && (
         <Card.Background>
@@ -54,9 +57,9 @@ function CityCard({
         </Text>
       </Card.Header>
       <Card.Footer padded>
-        <YStack gap="$2">
+        <YStack gap="$2" width="100%">
           {description && (
-            <Text size="$3" numberOfLines={2}>
+            <Text size="$3" flexWrap="wrap" flexShrink={1}>
               {description}
             </Text>
           )}
@@ -73,6 +76,16 @@ function CityCard({
 
 export function CitySelectorScreen() {
   const { data: cities, isLoading, error } = api.cities.list.useQuery()
+  const { setCity } = useCity()
+  const router = useRouter()
+
+  const handleSelectCity = (city: { id: string; slug: string; name: string; country: string }) => {
+    setCity(city)
+    // On web, also navigate to the city URL for SEO
+    if (Platform.OS === 'web') {
+      router.push(`/${city.slug}`)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -120,11 +133,18 @@ export function CitySelectorScreen() {
         {cities?.map((city) => (
           <CityCard
             key={city.id}
+            id={city.id}
             name={city.name}
             slug={city.slug}
             country={city.country}
             coverImageUrl={city.cover_image_url}
             description={city.description}
+            onSelect={() => handleSelectCity({
+              id: city.id,
+              slug: city.slug,
+              name: city.name,
+              country: city.country,
+            })}
           />
         ))}
       </XStack>

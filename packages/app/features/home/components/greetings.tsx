@@ -29,10 +29,11 @@ export const Greetings = () => {
         },
       })
     if (isError) {
+      const host = baseUrl && baseUrl.includes('://')
+        ? baseUrl.split('://')[1]?.split(':')[0]
+        : 'localhost'
       console.error(
-        `Tried to connect to tRPC server at ${baseUrl} but got an error. Run next.js server with 'yarn web -H ${
-          baseUrl.split('://')[1].split(':')[0]
-        }' to fix..`
+        `Tried to connect to tRPC server at ${baseUrl || 'current origin'} but got an error. Run next.js server with 'yarn web -H ${host}' to fix..`
       )
     }
   }, [data, isError, toast])

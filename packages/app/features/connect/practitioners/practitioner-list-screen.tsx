@@ -17,7 +17,7 @@ export function PractitionerListScreen({ citySlug }: { citySlug: string }) {
   const { data: specialties } = api.practitioners.getSpecialties.useQuery()
 
   // Get practitioners
-  const { data: practitioners, isLoading } = api.practitioners.listByCity.useQuery(
+  const { data, isLoading } = api.practitioners.listByCity.useQuery(
     {
       citySlug,
       specialty: selectedSpecialty || undefined,
@@ -25,6 +25,7 @@ export function PractitionerListScreen({ citySlug }: { citySlug: string }) {
     },
     { enabled: !!citySlug }
   )
+  const practitioners = data?.practitioners
 
   // Filter by search query (client-side for instant feedback)
   const filteredPractitioners = practitioners?.filter((p) => {

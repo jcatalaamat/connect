@@ -4,6 +4,7 @@ import { GlobalStoreProvider } from 'app/utils/global-store'
 import React from 'react'
 
 import { AuthProvider } from './auth'
+import { CityProvider } from './city'
 import { QueryClientProvider } from './react-query'
 import { SafeAreaProvider } from './safe-area'
 import { TamaguiProvider } from './tamagui'
@@ -48,4 +49,5 @@ const Providers = compose([
   ToastProvider,
   QueryClientProvider,
   GlobalStoreProvider,
+  CityProvider,
 ])
