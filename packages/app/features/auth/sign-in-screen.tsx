@@ -7,7 +7,6 @@ import {
   Text,
   Theme,
   YStack,
-  isWeb,
 } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -18,8 +17,6 @@ import { createParam } from 'solito'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
-
-import { SocialLogin } from './components/SocialLogin'
 
 const { useParams, useUpdateParams } = createParam<{ email?: string }>()
 
@@ -89,7 +86,6 @@ export const SignInScreen = () => {
                   </SubmitButton>
                 </Theme>
                 <SignUpLink />
-                {isWeb && <SocialLogin />}
               </>
             )
           }}
@@ -101,11 +97,6 @@ export const SignInScreen = () => {
                 <Paragraph theme="alt1">Sign in to your account</Paragraph>
               </YStack>
               {Object.values(fields)}
-              {!isWeb && (
-                <YStack mt="$4">
-                  <SocialLogin />
-                </YStack>
-              )}
             </>
           )}
         </SchemaForm>

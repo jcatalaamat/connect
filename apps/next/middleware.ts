@@ -5,15 +5,40 @@ import type { NextRequest } from 'next/server'
 // by default, all routes are protected
 
 // put the public routes here - these will be accessed by both guests and users
-const publicRoutes = ['/terms-of-service', '/privacy-policy']
+const publicRoutes = [
+  '/terms-of-service',
+  '/privacy-policy',
+  '/city-select',
+  '/book',
+  '/booking',
+]
+
+// City slugs that are public (dynamic routes)
+const publicCitySlugs = ['mallorca', 'mazunte']
+
 // put the authentication routes here - these will only be accessed by guests
 const authRoutes = ['/sign-in', '/sign-up', '/reset-password']
+
+// Helper to check if a path is a public city route
+function isPublicCityRoute(pathname: string): boolean {
+  const segments = pathname.split('/').filter(Boolean)
+  if (segments.length === 0) return false
+  const citySlug = segments[0]
+  // Allow all routes under public city slugs (e.g., /mallorca, /mallorca/practitioners)
+  return publicCitySlugs.includes(citySlug)
+}
 
 export async function middleware(req: NextRequest) {
   // we need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
+
   // public routes - no need for Supabase
   if (publicRoutes.some((route) => req.nextUrl.pathname.startsWith(route))) {
+    return res
+  }
+
+  // public city routes (e.g., /mallorca, /mazunte/practitioners)
+  if (isPublicCityRoute(req.nextUrl.pathname)) {
     return res
   }
   // create authenticated Supabase Client.

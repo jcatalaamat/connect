@@ -88,5 +88,8 @@
     "turbo": "^2.5.3",
     "typescript": "~5.8.3",
     "ultra-runner": "^3.10.5"
+  },
+  "dependencies": {
+    "stripe": "^20.1.0"
   }
 }

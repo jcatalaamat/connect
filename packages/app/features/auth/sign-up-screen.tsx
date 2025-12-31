@@ -7,7 +7,6 @@ import {
   Text,
   Theme,
   YStack,
-  isWeb,
 } from '@my/ui'
 import { ChevronLeft } from '@tamagui/lucide-icons'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
@@ -17,8 +16,6 @@ import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form
 import { createParam } from 'solito'
 import { Link } from 'solito/link'
 import { z } from 'zod'
-
-import { SocialLogin } from './components/SocialLogin'
 
 const { useParams, useUpdateParams } = createParam<{ email?: string }>()
 
@@ -92,7 +89,6 @@ export const SignUpScreen = () => {
                 </SubmitButton>
               </Theme>
               <SignInLink />
-              {isWeb && <SocialLogin />}
             </>
           )}
         >
@@ -103,11 +99,6 @@ export const SignUpScreen = () => {
                 <Paragraph theme="alt2">Create a new account</Paragraph>
               </YStack>
               {Object.values(fields)}
-              {!isWeb && (
-                <YStack mt="$4">
-                  <SocialLogin />
-                </YStack>
-              )}
             </>
           )}
         </SchemaForm>
