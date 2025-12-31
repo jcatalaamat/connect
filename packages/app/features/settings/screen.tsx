@@ -13,6 +13,16 @@ export const SettingsScreen = () => {
   const pathname = usePathname()
   const { isPractitioner, isAdmin, adminCitySlug, isAuthenticated } = useUserRole()
 
+  // All useLink calls at the top to maintain consistent hook order
+  const dashboardLink = useLink({ href: '/practitioner/dashboard' })
+  const adminLink = useLink({ href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin' })
+  const onboardingLink = useLink({ href: '/practitioner/onboarding' })
+  const generalLink = useLink({ href: media.sm ? '/settings/general' : '/settings' })
+  const changePasswordLink = useLink({ href: '/settings/change-password' })
+  const changeEmailLink = useLink({ href: '/settings/change-email' })
+  const privacyLink = useLink({ href: '/privacy-policy' })
+  const termsLink = useLink({ href: '/terms-of-service' })
+
   return (
     <YStack f={1}>
       <ScrollView>
@@ -24,7 +34,7 @@ export const SettingsScreen = () => {
                 {isPractitioner && (
                   <Settings.Item
                     icon={LayoutDashboard}
-                    {...useLink({ href: '/practitioner/dashboard' })}
+                    {...dashboardLink}
                     accentTheme="purple"
                   >
                     Practitioner Dashboard
@@ -33,7 +43,7 @@ export const SettingsScreen = () => {
                 {isAdmin && adminCitySlug && (
                   <Settings.Item
                     icon={Shield}
-                    {...useLink({ href: `/admin/${adminCitySlug}` })}
+                    {...adminLink}
                     accentTheme="orange"
                   >
                     Admin Dashboard
@@ -42,7 +52,7 @@ export const SettingsScreen = () => {
                 {isAuthenticated && !isPractitioner && (
                   <Settings.Item
                     icon={UserPlus}
-                    {...useLink({ href: '/practitioner/onboarding' })}
+                    {...onboardingLink}
                     accentTheme="pink"
                   >
                     Become a Practitioner
@@ -57,7 +67,7 @@ export const SettingsScreen = () => {
               <Settings.Item
                 icon={Cog}
                 isActive={pathname === 'settings/general'}
-                {...useLink({ href: media.sm ? '/settings/general' : '/settings' })}
+                {...generalLink}
                 accentTheme="green"
               >
                 General
@@ -65,7 +75,7 @@ export const SettingsScreen = () => {
               <Settings.Item
                 icon={Lock}
                 isActive={pathname === '/settings/change-password'}
-                {...useLink({ href: '/settings/change-password' })}
+                {...changePasswordLink}
                 accentTheme="green"
               >
                 Change Password
@@ -73,7 +83,7 @@ export const SettingsScreen = () => {
               <Settings.Item
                 icon={Mail}
                 isActive={pathname === '/settings/change-email'}
-                {...useLink({ href: '/settings/change-email' })}
+                {...changeEmailLink}
                 accentTheme="green"
               >
                 Change Email
@@ -84,7 +94,7 @@ export const SettingsScreen = () => {
               <Settings.Item
                 icon={Book}
                 isActive={pathname === '/privacy-policy'}
-                {...useLink({ href: '/privacy-policy' })}
+                {...privacyLink}
                 accentTheme="purple"
               >
                 Privacy Policy
@@ -92,7 +102,7 @@ export const SettingsScreen = () => {
               <Settings.Item
                 icon={Book}
                 isActive={pathname === '/terms-of-service'}
-                {...useLink({ href: '/terms-of-service' })}
+                {...termsLink}
                 accentTheme="purple"
               >
                 Terms Of Service

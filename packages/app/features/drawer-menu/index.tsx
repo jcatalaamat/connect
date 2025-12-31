@@ -11,12 +11,22 @@ import { useLink } from 'solito/link'
 
 export function DrawerMenu(props) {
   const { profile, avatarUrl, session } = useUser()
-  const { city, citySlug, clearCity } = useCity()
+  const { city, clearCity } = useCity()
   const { isPractitioner, isAdmin, isAuthenticated, adminCitySlug } = useUserRole()
   const supabase = useSupabase()
   const name = profile?.name
   const insets = useSafeAreaInsets()
   const height = useWindowDimensions().height
+
+  // All useLink calls at the top to maintain consistent hook order
+  const browseLink = useLink({ href: '/' })
+  const bookingLookupLink = useLink({ href: '/booking/lookup' })
+  const dashboardLink = useLink({ href: '/practitioner/dashboard' })
+  const adminLink = useLink({ href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin/mallorca' })
+  const onboardingLink = useLink({ href: '/practitioner/onboarding' })
+  const profileEditLink = useLink({ href: '/profile/edit' })
+  const settingsLink = useLink({ href: '/settings' })
+  const signInLink = useLink({ href: '/sign-in' })
 
   const handleLogout = () => {
     supabase.auth.signOut()
@@ -59,14 +69,14 @@ export function DrawerMenu(props) {
             <Settings.Group>
               <Settings.Item
                 icon={Home}
-                {...useLink({ href: '/' })}
+                {...browseLink}
                 accentTheme="blue"
               >
                 Browse
               </Settings.Item>
               <Settings.Item
                 icon={Calendar}
-                {...useLink({ href: '/booking/lookup' })}
+                {...bookingLookupLink}
                 accentTheme="green"
               >
                 Find Booking
@@ -78,7 +88,7 @@ export function DrawerMenu(props) {
               <Settings.Group>
                 <Settings.Item
                   icon={LayoutDashboard}
-                  {...useLink({ href: '/practitioner/dashboard' })}
+                  {...dashboardLink}
                   accentTheme="purple"
                 >
                   My Dashboard
@@ -91,7 +101,7 @@ export function DrawerMenu(props) {
               <Settings.Group>
                 <Settings.Item
                   icon={Shield}
-                  {...useLink({ href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin/mallorca' })}
+                  {...adminLink}
                   accentTheme="orange"
                 >
                   City Admin
@@ -104,7 +114,7 @@ export function DrawerMenu(props) {
               <Settings.Group>
                 <Settings.Item
                   icon={UserPlus}
-                  {...useLink({ href: '/practitioner/onboarding' })}
+                  {...onboardingLink}
                   accentTheme="pink"
                 >
                   Become a Practitioner
@@ -118,12 +128,12 @@ export function DrawerMenu(props) {
                 <>
                   <Settings.Item
                     icon={User}
-                    {...useLink({ href: '/profile/edit' })}
+                    {...profileEditLink}
                     accentTheme="gray"
                   >
                     Edit Profile
                   </Settings.Item>
-                  <Settings.Item {...useLink({ href: '/settings' })} icon={Cog}>
+                  <Settings.Item {...settingsLink} icon={Cog}>
                     Settings
                   </Settings.Item>
                   <Settings.Item
@@ -137,7 +147,7 @@ export function DrawerMenu(props) {
               ) : (
                 <Settings.Item
                   icon={LogIn}
-                  {...useLink({ href: '/sign-in' })}
+                  {...signInLink}
                   accentTheme="blue"
                 >
                   Sign In

@@ -109,7 +109,7 @@ export const adminRouter = createTRPCRouter({
           approved_at,
           rejection_reason,
           created_at,
-          profiles!inner (
+          profiles!practitioners_profile_id_fkey (
             id,
             name,
             avatar_url
@@ -128,9 +128,10 @@ export const adminRouter = createTRPCRouter({
       const { data: practitioners, error, count } = await query
 
       if (error) {
+        console.error('listPractitioners error:', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to fetch practitioners',
+          message: `Failed to fetch practitioners: ${error.message}`,
           cause: error,
         })
       }
