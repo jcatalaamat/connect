@@ -1,16 +1,16 @@
-import { DrawerMenu } from '@my/app/features/drawer-menu'
+import { SettingsScreen } from 'app/features/settings/screen'
 import { Stack } from 'expo-router'
 
-export default function Screen() {
+export default function ProfileTabScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Profile',
+          title: 'Settings',
           headerShown: false,
         }}
       />
-      <DrawerMenu />
+      <SettingsScreen />
     </>
   )
 }

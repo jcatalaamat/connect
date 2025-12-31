@@ -1,16 +1,26 @@
-import { Avatar, Paragraph, Settings, XStack, YStack, getTokens, useWindowDimensions } from '@my/ui'
+import { Avatar, Button, Paragraph, Separator, Settings, Text, XStack, YStack, getTokens, useWindowDimensions } from '@my/ui'
 import { DrawerContentScrollView } from '@react-navigation/drawer'
-import { Box, Cog, Milestone, ShoppingCart, User, Users } from '@tamagui/lucide-icons'
+import { Calendar, Cog, Home, LayoutDashboard, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
+import { useCity } from 'app/provider/city'
+import { useUserRole } from 'app/hooks'
 import { useSafeAreaInsets } from 'app/utils/useSafeAreaInsets'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
 
 export function DrawerMenu(props) {
-  const { profile, avatarUrl } = useUser()
+  const { profile, avatarUrl, session } = useUser()
+  const { city, citySlug, clearCity } = useCity()
+  const { isPractitioner, isAdmin, isAuthenticated } = useUserRole()
+  const supabase = useSupabase()
   const name = profile?.name
   const insets = useSafeAreaInsets()
   const height = useWindowDimensions().height
+
+  const handleLogout = () => {
+    supabase.auth.signOut()
+  }
 
   return (
     <DrawerContentScrollView {...props} f={1}>
@@ -23,44 +33,137 @@ export function DrawerMenu(props) {
         py="$4"
         pb="$2"
       >
+        {/* City Selection */}
+        {city && (
+          <YStack paddingHorizontal="$4" paddingBottom="$4">
+            <XStack alignItems="center" gap="$2">
+              <MapPin size={16} color="$gray10" />
+              <Text size="$3" theme="alt2">{city.name}, {city.country}</Text>
+            </XStack>
+            <Button
+              size="$2"
+              marginTop="$2"
+              variant="outlined"
+              onPress={clearCity}
+            >
+              Change City
+            </Button>
+          </YStack>
+        )}
+
+        <Separator marginBottom="$2" />
+
         <Settings>
           <Settings.Items>
+            {/* Main Navigation */}
             <Settings.Group>
-              <Settings.Item icon={User} {...useLink({ href: '/profile/edit' })} accentTheme="pink">
-                Edit profile
+              <Settings.Item
+                icon={Home}
+                {...useLink({ href: citySlug ? `/${citySlug}` : '/' })}
+                accentTheme="blue"
+              >
+                {city ? 'Browse Practitioners' : 'Choose City'}
               </Settings.Item>
-              <Settings.Item icon={Box} accentTheme="green">
-                My Items
+              <Settings.Item
+                icon={Calendar}
+                {...useLink({ href: '/booking/lookup' })}
+                accentTheme="green"
+              >
+                Find Booking
               </Settings.Item>
-              <Settings.Item icon={Users} accentTheme="orange">
-                Refer Your Friends
-              </Settings.Item>
-              <Settings.Item icon={Milestone} accentTheme="gray">
-                Address Info
-              </Settings.Item>
-              <Settings.Item icon={ShoppingCart} accentTheme="blue">
-                Purchase History
-              </Settings.Item>
-              <Settings.Item {...useLink({ href: '/settings' })} icon={Cog}>
-                Settings
-              </Settings.Item>
+            </Settings.Group>
+
+            {/* Practitioner Section */}
+            {isPractitioner && (
+              <Settings.Group>
+                <Settings.Item
+                  icon={LayoutDashboard}
+                  {...useLink({ href: '/practitioner/dashboard' })}
+                  accentTheme="purple"
+                >
+                  My Dashboard
+                </Settings.Item>
+              </Settings.Group>
+            )}
+
+            {/* Admin Section */}
+            {isAdmin && citySlug && (
+              <Settings.Group>
+                <Settings.Item
+                  icon={Shield}
+                  {...useLink({ href: `/admin/${citySlug}` })}
+                  accentTheme="orange"
+                >
+                  City Admin
+                </Settings.Item>
+              </Settings.Group>
+            )}
+
+            {/* Become a Practitioner */}
+            {isAuthenticated && !isPractitioner && (
+              <Settings.Group>
+                <Settings.Item
+                  icon={UserPlus}
+                  {...useLink({ href: '/practitioner/onboarding' })}
+                  accentTheme="pink"
+                >
+                  Become a Practitioner
+                </Settings.Item>
+              </Settings.Group>
+            )}
+
+            {/* Account Section */}
+            <Settings.Group>
+              {isAuthenticated ? (
+                <>
+                  <Settings.Item
+                    icon={User}
+                    {...useLink({ href: '/profile/edit' })}
+                    accentTheme="gray"
+                  >
+                    Edit Profile
+                  </Settings.Item>
+                  <Settings.Item {...useLink({ href: '/settings' })} icon={Cog}>
+                    Settings
+                  </Settings.Item>
+                  <Settings.Item
+                    icon={LogOut}
+                    onPress={handleLogout}
+                    accentTheme="red"
+                  >
+                    Log Out
+                  </Settings.Item>
+                </>
+              ) : (
+                <Settings.Item
+                  icon={LogIn}
+                  {...useLink({ href: '/sign-in' })}
+                  accentTheme="blue"
+                >
+                  Sign In
+                </Settings.Item>
+              )}
             </Settings.Group>
           </Settings.Items>
         </Settings>
 
-        <XStack gap="$4" mb="$7" mt="auto" ai="center" px="$4">
-          <Avatar circular size="$3">
-            <SolitoImage
-              src={avatarUrl}
-              alt="your avatar"
-              width={getTokens().size['3'].val}
-              height={getTokens().size['3'].val}
-            />
-          </Avatar>
-          <Paragraph ta="center" ml="$-1.5">
-            {name ?? 'No Name'}
-          </Paragraph>
-        </XStack>
+        {/* User Info Footer */}
+        {isAuthenticated && (
+          <XStack gap="$4" mb="$7" mt="auto" ai="center" px="$4">
+            <Avatar circular size="$3">
+              <SolitoImage
+                src={avatarUrl}
+                alt="your avatar"
+                width={getTokens().size['3'].val}
+                height={getTokens().size['3'].val}
+              />
+            </Avatar>
+            <YStack>
+              <Paragraph>{name ?? 'No Name'}</Paragraph>
+              <Text size="$1" theme="alt2">{session?.user?.email}</Text>
+            </YStack>
+          </XStack>
+        )}
       </YStack>
     </DrawerContentScrollView>
   )

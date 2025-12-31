@@ -1,12 +1,10 @@
 import { Paragraph, ScrollView, Separator, Settings, YStack, isWeb, useMedia } from '@my/ui'
-import { Book, Cog, Info, Lock, LogOut, Mail, Moon, Twitter } from '@tamagui/lucide-icons'
+import { Book, Cog, Lock, LogOut, Mail, Moon } from '@tamagui/lucide-icons'
 import { useThemeSetting } from 'app/provider/theme'
-import { redirect } from 'app/utils/redirect'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePathname } from 'app/utils/usePathname'
 import { useLink } from 'solito/link'
 
-import rootPackageJson from '../../../../package.json'
 import packageJson from '../../package.json'
 
 export const SettingsScreen = () => {
@@ -62,24 +60,6 @@ export const SettingsScreen = () => {
               >
                 Terms Of Service
               </Settings.Item>
-              {/* removing about from web since landing pages are more common on web - feel free to add back if needed */}
-              {!isWeb && (
-                // isWeb is a constant so this isn't really a conditional hook
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                <Settings.Item icon={Info} {...useLink({ href: '/about' })} accentTheme="blue">
-                  About
-                </Settings.Item>
-              )}
-            </Settings.Group>
-            {isWeb && <Separator boc="$color3" mx="$-4" bw="$0.25" />}
-            <Settings.Group>
-              <Settings.Item
-                icon={Twitter}
-                onPress={() => redirect('https://twitter.com/tamagui_js')}
-                accentTheme="blue"
-              >
-                Our Twitter
-              </Settings.Item>
             </Settings.Group>
             {isWeb && <Separator boc="$color3" mx="$-4" bw="$0.25" />}
             <Settings.Group>
@@ -89,12 +69,8 @@ export const SettingsScreen = () => {
           </Settings.Items>
         </Settings>
       </ScrollView>
-      {/*
-      NOTE: you should probably get the actual native version here using https://www.npmjs.com/package/react-native-version-info
-      we just did a simple package.json read since we want to keep things simple for the starter
-       */}
       <Paragraph py="$2" ta="center" theme="alt2">
-        {rootPackageJson.name} {packageJson.version}
+        Connect v{packageJson.version}
       </Paragraph>
     </YStack>
   )
