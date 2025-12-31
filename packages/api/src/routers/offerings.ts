@@ -43,6 +43,94 @@ const addEventDateInput = z.object({
 })
 
 export const offeringsRouter = createTRPCRouter({
+  // Browse offerings by city (public) - for events/sessions discovery
+  listByCity: publicProcedure
+    .input(
+      z.object({
+        citySlug: z.string(),
+        type: z.enum(['session', 'event']).optional(),
+        limit: z.number().min(1).max(100).default(20),
+        offset: z.number().min(0).default(0),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // Get city ID
+      const { data: city } = await ctx.supabase
+        .from('cities')
+        .select('id')
+        .eq('slug', input.citySlug)
+        .single()
+
+      if (!city) {
+        return { offerings: [], total: 0, hasMore: false }
+      }
+
+      // Get approved practitioner IDs in this city
+      const { data: practitioners } = await ctx.supabase
+        .from('practitioners')
+        .select('id')
+        .eq('city_id', city.id)
+        .eq('status', 'approved')
+
+      if (!practitioners || practitioners.length === 0) {
+        return { offerings: [], total: 0, hasMore: false }
+      }
+
+      const practitionerIds = practitioners.map((p) => p.id)
+
+      // Build query for offerings
+      let query = ctx.supabase
+        .from('offerings')
+        .select(
+          `
+          id,
+          type,
+          title,
+          description,
+          price_cents,
+          currency,
+          duration_minutes,
+          capacity,
+          location_type,
+          location_address,
+          cover_image_url,
+          is_active,
+          created_at,
+          practitioners!inner (
+            id,
+            business_name,
+            slug,
+            avatar_url
+          )
+        `,
+          { count: 'exact' }
+        )
+        .in('practitioner_id', practitionerIds)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .range(input.offset, input.offset + input.limit - 1)
+
+      if (input.type) {
+        query = query.eq('type', input.type)
+      }
+
+      const { data: offerings, error, count } = await query
+
+      if (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to fetch offerings',
+          cause: error,
+        })
+      }
+
+      return {
+        offerings: offerings ?? [],
+        total: count ?? 0,
+        hasMore: (count ?? 0) > input.offset + input.limit,
+      }
+    }),
+
   // Get offerings by practitioner (public)
   listByPractitioner: publicProcedure
     .input(

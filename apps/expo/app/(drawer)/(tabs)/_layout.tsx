@@ -10,7 +10,7 @@ export default function Layout() {
   const navigation = useNavigation()
   const pathname = usePathname()
   const insets = useSafeAreaInsets()
-  const { isPractitioner, isAdmin, isLoading } = useUserRole()
+  const { isPractitioner, isAdmin, adminCitySlug, isLoading } = useUserRole()
 
   return (
     <>

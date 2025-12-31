@@ -1,9 +1,9 @@
 import { AdminDashboardScreen } from 'app/features/connect/admin'
-import { useCity } from 'app/provider/city'
+import { useUserRole } from 'app/hooks'
 import { YStack, Text, Spinner } from '@my/ui'
 
 export default function AdminTabScreen() {
-  const { citySlug, isLoading } = useCity()
+  const { adminCitySlug, isLoading, isAdmin } = useUserRole()
 
   if (isLoading) {
     return (
@@ -13,13 +13,13 @@ export default function AdminTabScreen() {
     )
   }
 
-  if (!citySlug) {
+  if (!isAdmin || !adminCitySlug) {
     return (
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
-        <Text>Please select a city first</Text>
+        <Text>You are not an admin for any city</Text>
       </YStack>
     )
   }
 
-  return <AdminDashboardScreen citySlug={citySlug} />
+  return <AdminDashboardScreen citySlug={adminCitySlug} />
 }
