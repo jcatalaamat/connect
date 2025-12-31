@@ -1,4 +1,4 @@
-import { CitySelectorScreen } from 'app/features/connect/city'
+import { BrowseScreen } from 'app/features/connect/browse'
 import Head from 'next/head'
 
 export default function Page() {
@@ -7,7 +7,7 @@ export default function Page() {
       <Head>
         <title>Connect - Find Wellness Practitioners</title>
       </Head>
-      <CitySelectorScreen />
+      <BrowseScreen />
     </>
   )
 }
