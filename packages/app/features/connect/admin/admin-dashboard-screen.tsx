@@ -130,7 +130,7 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
 
       {/* Pending Approvals Alert */}
       {(stats?.practitioners.pending ?? 0) > 0 && (
-        <Card bordered backgroundColor="$orange2" padding="$4" {...practitionersLink}>
+        <Card bordered backgroundColor="$orange2" padding="$4" cursor="pointer" hoverStyle={{ opacity: 0.9 }} {...practitionersLink}>
           <XStack justifyContent="space-between" alignItems="center">
             <XStack gap="$3" alignItems="center">
               <Clock size={24} color="$orange10" />
@@ -151,7 +151,7 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
       <YStack gap="$4">
         <H2 size="$5">Manage</H2>
 
-        <Card bordered padding="$4" {...practitionersLink} pressStyle={{ opacity: 0.8 }}>
+        <Card bordered padding="$4" cursor="pointer" hoverStyle={{ opacity: 0.9 }} pressStyle={{ opacity: 0.8 }} {...practitionersLink}>
           <XStack justifyContent="space-between" alignItems="center">
             <XStack gap="$3" alignItems="center">
               <Users size={24} color="$blue10" />
@@ -166,7 +166,7 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
           </XStack>
         </Card>
 
-        <Card bordered padding="$4" {...settingsLink} pressStyle={{ opacity: 0.8 }}>
+        <Card bordered padding="$4" cursor="pointer" hoverStyle={{ opacity: 0.9 }} pressStyle={{ opacity: 0.8 }} {...settingsLink}>
           <XStack justifyContent="space-between" alignItems="center">
             <XStack gap="$3" alignItems="center">
               <Settings size={24} color="$gray10" />
