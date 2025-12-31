@@ -1,6 +1,6 @@
 import { api } from 'app/utils/api'
 import { useCity } from 'app/provider/city'
-import { useAuth } from 'app/utils/auth/useAuth'
+import { useUser } from 'app/utils/useUser'
 
 export type UserRole = 'guest' | 'customer' | 'practitioner' | 'admin'
 
@@ -14,7 +14,7 @@ interface UseUserRoleResult {
 }
 
 export function useUserRole(): UseUserRoleResult {
-  const { session } = useAuth()
+  const { session } = useUser()
   const { city } = useCity()
   const isAuthenticated = !!session?.user
 
