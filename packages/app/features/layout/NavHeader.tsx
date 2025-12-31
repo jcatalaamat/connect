@@ -1,6 +1,6 @@
 import { XStack, YStack, H3, Button, Text, Sheet, Separator, Anchor } from '@my/ui'
 import { useRouter } from 'solito/navigation'
-import { Menu, X, Home, Calendar, User, LayoutDashboard, Shield, LogIn, UserPlus } from '@tamagui/lucide-icons'
+import { Menu, X, Home, Calendar, User, LayoutDashboard, Shield, LogIn, UserPlus, Settings } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { useCity } from 'app/provider/city'
@@ -53,10 +53,22 @@ export function NavHeader() {
       show: isAdmin && !!adminCitySlug,
     },
     {
-      label: isAuthenticated ? 'Profile' : 'Sign In',
-      href: isAuthenticated ? '/profile' : '/sign-in',
-      icon: isAuthenticated ? <User size={18} /> : <LogIn size={18} />,
-      show: true,
+      label: 'Profile',
+      href: '/profile',
+      icon: <User size={18} />,
+      show: isAuthenticated,
+    },
+    {
+      label: 'Settings',
+      href: '/settings',
+      icon: <Settings size={18} />,
+      show: isAuthenticated,
+    },
+    {
+      label: 'Sign In',
+      href: '/sign-in',
+      icon: <LogIn size={18} />,
+      show: !isAuthenticated,
     },
   ]
 

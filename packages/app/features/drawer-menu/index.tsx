@@ -59,10 +59,10 @@ export function DrawerMenu(props) {
             <Settings.Group>
               <Settings.Item
                 icon={Home}
-                {...useLink({ href: citySlug ? `/${citySlug}` : '/' })}
+                {...useLink({ href: '/' })}
                 accentTheme="blue"
               >
-                {city ? 'Browse Practitioners' : 'Choose City'}
+                Browse
               </Settings.Item>
               <Settings.Item
                 icon={Calendar}
