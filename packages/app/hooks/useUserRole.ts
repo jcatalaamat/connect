@@ -31,9 +31,20 @@ export function useUserRole(): UseUserRoleResult {
   const {
     data: adminCities,
     isLoading: adminLoading,
+    error: adminError,
   } = api.admin.getAdminCities.useQuery(undefined, {
     enabled: isAuthenticated,
   })
+
+  // Debug logging for admin status
+  if (__DEV__ && isAuthenticated && !adminLoading) {
+    console.log('[useUserRole] Admin check:', {
+      adminCities,
+      adminError: adminError?.message,
+      isAdmin: (adminCities?.length ?? 0) > 0,
+      adminCitySlug: (adminCities?.[0]?.cities as any)?.slug ?? null,
+    })
+  }
 
   const isLoading = isAuthenticated && (practitionerLoading || adminLoading)
   const isPractitioner = !!practitionerProfile && practitionerProfile.status === 'approved'

@@ -86,12 +86,12 @@ export function DrawerMenu(props) {
               </Settings.Group>
             )}
 
-            {/* Admin Section */}
-            {isAdmin && adminCitySlug && (
+            {/* Admin Section - always show if admin */}
+            {isAdmin && (
               <Settings.Group>
                 <Settings.Item
                   icon={Shield}
-                  {...useLink({ href: `/admin/${adminCitySlug}` })}
+                  {...useLink({ href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin/mallorca' })}
                   accentTheme="orange"
                 >
                   City Admin
