@@ -2,11 +2,26 @@ import { z } from 'zod'
 import { createTRPCRouter, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
 
+// Categories for offerings (matches SPECIALTIES in practitioners router)
+export const CATEGORIES = [
+  'Yoga',
+  'Meditation',
+  'Breathwork',
+  'Sound Healing',
+  'Reiki',
+  'Massage',
+  'Cacao Ceremony',
+  'Temazcal',
+  'Holistic Therapy',
+  'Energy Work',
+] as const
+
 // Input schemas
 const createOfferingInput = z.object({
   type: z.enum(['session', 'event']),
   title: z.string().min(2).max(255),
   description: z.string().max(2000).optional(),
+  category: z.string().optional(),
   priceCents: z.number().int().min(0),
   currency: z.string().length(3).default('USD'),
   depositRequired: z.boolean().default(false),
@@ -49,6 +64,7 @@ export const offeringsRouter = createTRPCRouter({
       z.object({
         citySlug: z.string(),
         type: z.enum(['session', 'event']).optional(),
+        category: z.string().optional(),
         limit: z.number().min(1).max(100).default(20),
         offset: z.number().min(0).default(0),
       })
@@ -87,6 +103,7 @@ export const offeringsRouter = createTRPCRouter({
           type,
           title,
           description,
+          category,
           price_cents,
           currency,
           duration_minutes,
@@ -112,6 +129,10 @@ export const offeringsRouter = createTRPCRouter({
 
       if (input.type) {
         query = query.eq('type', input.type)
+      }
+
+      if (input.category) {
+        query = query.eq('category', input.category)
       }
 
       const { data: offerings, error, count } = await query
@@ -149,6 +170,7 @@ export const offeringsRouter = createTRPCRouter({
           type,
           title,
           description,
+          category,
           price_cents,
           currency,
           duration_minutes,
@@ -196,6 +218,7 @@ export const offeringsRouter = createTRPCRouter({
           type,
           title,
           description,
+          category,
           price_cents,
           currency,
           deposit_required,
@@ -331,6 +354,7 @@ export const offeringsRouter = createTRPCRouter({
         type: input.type,
         title: input.title,
         description: input.description,
+        category: input.category,
         price_cents: input.priceCents,
         currency: input.currency,
         deposit_required: input.depositRequired,
@@ -375,6 +399,7 @@ export const offeringsRouter = createTRPCRouter({
     if (input.type) updateData.type = input.type
     if (input.title) updateData.title = input.title
     if (input.description !== undefined) updateData.description = input.description
+    if (input.category !== undefined) updateData.category = input.category
     if (input.priceCents !== undefined) updateData.price_cents = input.priceCents
     if (input.currency) updateData.currency = input.currency
     if (input.depositRequired !== undefined) updateData.deposit_required = input.depositRequired
@@ -703,6 +728,7 @@ export const offeringsRouter = createTRPCRouter({
           type,
           title,
           description,
+          category,
           price_cents,
           currency,
           duration_minutes,
@@ -732,4 +758,9 @@ export const offeringsRouter = createTRPCRouter({
 
       return offerings ?? []
     }),
+
+  // Get available categories
+  getCategories: publicProcedure.query(() => {
+    return CATEGORIES
+  }),
 })

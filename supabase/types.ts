@@ -396,6 +396,7 @@ export type Database = {
       offerings: {
         Row: {
           capacity: number | null
+          category: string | null
           cover_image_url: string | null
           created_at: string | null
           currency: string | null
@@ -417,6 +418,7 @@ export type Database = {
         }
         Insert: {
           capacity?: number | null
+          category?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           currency?: string | null
@@ -438,6 +440,7 @@ export type Database = {
         }
         Update: {
           capacity?: number | null
+          category?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           currency?: string | null

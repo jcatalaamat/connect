@@ -15,6 +15,7 @@ export function BrowseScreen() {
   const [activeTab, setActiveTab] = useState<TabValue>('events')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   // Get all cities for dropdown
   const { data: cities } = api.cities.list.useQuery()
@@ -33,18 +34,31 @@ export function BrowseScreen() {
 
   // Get events for selected city
   const { data: eventsData, isLoading: eventsLoading } = api.offerings.listByCity.useQuery(
-    { citySlug: city?.slug || '', type: 'event', limit: 50 },
+    {
+      citySlug: city?.slug || '',
+      type: 'event',
+      category: selectedCategory || undefined,
+      limit: 50,
+    },
     { enabled: !!city?.slug }
   )
 
   // Get services (sessions) for selected city
   const { data: servicesData, isLoading: servicesLoading } = api.offerings.listByCity.useQuery(
-    { citySlug: city?.slug || '', type: 'session', limit: 50 },
+    {
+      citySlug: city?.slug || '',
+      type: 'session',
+      category: selectedCategory || undefined,
+      limit: 50,
+    },
     { enabled: !!city?.slug }
   )
 
   // Get specialties for filtering practitioners
   const { data: specialties } = api.practitioners.getSpecialties.useQuery()
+
+  // Get categories for filtering events/services
+  const { data: categories } = api.offerings.getCategories.useQuery()
 
   // Get practitioners for selected city
   const { data: practitionersData, isLoading: practitionersLoading } = api.practitioners.listByCity.useQuery(
@@ -174,6 +188,7 @@ export function BrowseScreen() {
               setActiveTab(val as TabValue)
               setSearchQuery('')
               setSelectedSpecialty(null)
+              setSelectedCategory(null)
             }}
             orientation="horizontal"
             flexDirection="column"
@@ -222,6 +237,33 @@ export function BrowseScreen() {
               onChangeText={setSearchQuery}
             />
           </XStack>
+
+          {/* Category Filters - for events and services tabs */}
+          {(activeTab === 'events' || activeTab === 'services') && categories && categories.length > 0 && (
+            <XStack gap="$2" flexWrap="wrap">
+              <Button
+                size="$2"
+                borderRadius="$10"
+                theme={!selectedCategory ? 'active' : undefined}
+                variant={selectedCategory ? 'outlined' : undefined}
+                onPress={() => setSelectedCategory(null)}
+              >
+                All
+              </Button>
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  size="$2"
+                  borderRadius="$10"
+                  theme={selectedCategory === category ? 'active' : undefined}
+                  variant={selectedCategory !== category ? 'outlined' : undefined}
+                  onPress={() => setSelectedCategory(category === selectedCategory ? null : category)}
+                >
+                  {category}
+                </Button>
+              ))}
+            </XStack>
+          )}
 
           {/* Specialty Filters - only for practitioners tab */}
           {activeTab === 'practitioners' && specialties && specialties.length > 0 && (
@@ -278,6 +320,7 @@ export function BrowseScreen() {
                         capacity={offering.capacity}
                         locationType={offering.location_type as 'in_person' | 'virtual' | 'hybrid'}
                         coverImageUrl={offering.cover_image_url}
+                        category={offering.category}
                         onPress={() => router.push(`/book/${offering.id}`)}
                       />
                       <Text size="$1" theme="alt2" paddingLeft="$2">
@@ -293,13 +336,19 @@ export function BrowseScreen() {
                     No events found
                   </Text>
                   <Text textAlign="center" theme="alt2">
-                    {searchQuery
-                      ? 'Try adjusting your search'
+                    {searchQuery || selectedCategory
+                      ? 'Try adjusting your search or filters'
                       : 'No events are scheduled in this area yet'}
                   </Text>
-                  {searchQuery && (
-                    <Button variant="outlined" onPress={() => setSearchQuery('')}>
-                      Clear Search
+                  {(searchQuery || selectedCategory) && (
+                    <Button
+                      variant="outlined"
+                      onPress={() => {
+                        setSearchQuery('')
+                        setSelectedCategory(null)
+                      }}
+                    >
+                      Clear Filters
                     </Button>
                   )}
                 </YStack>
@@ -328,6 +377,7 @@ export function BrowseScreen() {
                         capacity={offering.capacity}
                         locationType={offering.location_type as 'in_person' | 'virtual' | 'hybrid'}
                         coverImageUrl={offering.cover_image_url}
+                        category={offering.category}
                         onPress={() => router.push(`/book/${offering.id}`)}
                       />
                       <Text size="$1" theme="alt2" paddingLeft="$2">
@@ -343,13 +393,19 @@ export function BrowseScreen() {
                     No services found
                   </Text>
                   <Text textAlign="center" theme="alt2">
-                    {searchQuery
-                      ? 'Try adjusting your search'
+                    {searchQuery || selectedCategory
+                      ? 'Try adjusting your search or filters'
                       : 'No services are available in this area yet'}
                   </Text>
-                  {searchQuery && (
-                    <Button variant="outlined" onPress={() => setSearchQuery('')}>
-                      Clear Search
+                  {(searchQuery || selectedCategory) && (
+                    <Button
+                      variant="outlined"
+                      onPress={() => {
+                        setSearchQuery('')
+                        setSelectedCategory(null)
+                      }}
+                    >
+                      Clear Filters
                     </Button>
                   )}
                 </YStack>

@@ -22,6 +22,7 @@ export type OfferingCardProps = {
   capacity?: number | null
   locationType: 'in_person' | 'virtual' | 'hybrid'
   coverImageUrl?: string | null
+  category?: string | null
   isActive?: boolean
   linkProps?: ReturnType<typeof useLink>
   onPress?: () => void
@@ -50,6 +51,7 @@ export const OfferingCard = ({
   durationMinutes,
   capacity,
   locationType,
+  category,
   isActive = true,
   linkProps,
   onPress,
@@ -80,12 +82,19 @@ export const OfferingCard = ({
       <YStack gap="$3">
         <XStack jc="space-between" ai="flex-start">
           <YStack f={1} gap="$1">
-            <XStack gap="$2" ai="center">
+            <XStack gap="$2" ai="center" flexWrap="wrap">
               <Theme name={type === 'session' ? 'green' : 'purple'}>
                 <Button size="$1" px="$2" br="$10" disabled>
                   {type === 'session' ? '1:1 Session' : 'Event'}
                 </Button>
               </Theme>
+              {category && (
+                <Theme name="blue">
+                  <Button size="$1" px="$2" br="$10" disabled>
+                    {category}
+                  </Button>
+                </Theme>
+              )}
               {!isActive && (
                 <Theme name="gray">
                   <Button size="$1" px="$2" br="$10" disabled>
