@@ -1,6 +1,6 @@
 import { XStack, YStack, H3, Button, Text, Sheet, Separator, Anchor } from '@my/ui'
 import { useRouter } from 'solito/navigation'
-import { Menu, X, Compass, CalendarCheck, User, LayoutDashboard, Shield, LogIn, UserPlus, Settings } from '@tamagui/lucide-icons'
+import { Menu, X, Compass, CalendarCheck, User, Briefcase, Shield, LogIn, UserPlus, Settings } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { useCity } from 'app/provider/city'
@@ -35,9 +35,9 @@ export function NavHeader() {
       show: true,
     },
     {
-      label: 'Dashboard',
+      label: 'My Offerings',
       href: '/practitioner/dashboard',
-      icon: <LayoutDashboard size={18} />,
+      icon: <Briefcase size={18} />,
       show: isPractitioner,
     },
     {

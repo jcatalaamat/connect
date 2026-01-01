@@ -1,6 +1,6 @@
 import { Avatar, Button, Paragraph, Separator, Settings, Text, XStack, YStack, getTokens, useWindowDimensions } from '@my/ui'
 import { DrawerContentScrollView } from '@react-navigation/drawer'
-import { CalendarCheck, Cog, Compass, LayoutDashboard, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
+import { Briefcase, CalendarCheck, Cog, Compass, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
 import { useCity } from 'app/provider/city'
 import { useUserRole } from 'app/hooks'
 import { useSafeAreaInsets } from 'app/utils/useSafeAreaInsets'
@@ -87,11 +87,11 @@ export function DrawerMenu(props) {
             {isPractitioner && (
               <Settings.Group>
                 <Settings.Item
-                  icon={LayoutDashboard}
+                  icon={Briefcase}
                   {...dashboardLink}
                   accentTheme="purple"
                 >
-                  Dashboard
+                  My Offerings
                 </Settings.Item>
               </Settings.Group>
             )}

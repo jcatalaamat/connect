@@ -1,6 +1,6 @@
 import { useTheme, Button } from '@my/ui'
 import { DrawerActions } from '@react-navigation/native'
-import { Compass, Menu, CalendarCheck, LayoutDashboard, Shield, User } from '@tamagui/lucide-icons'
+import { Compass, Menu, CalendarCheck, Briefcase, Shield, User } from '@tamagui/lucide-icons'
 import { Stack, Tabs, useNavigation } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useUserRole } from 'app/hooks'
@@ -79,15 +79,15 @@ export default function Layout() {
           }}
         />
 
-        {/* Dashboard Tab - Practitioners only */}
+        {/* My Offerings Tab - Practitioners only */}
         <Tabs.Screen
           name="dashboard"
           options={{
             headerShown: false,
-            title: 'Dashboard',
+            title: 'My Offerings',
             href: isPractitioner ? '/dashboard' : null,
             tabBarIcon: ({ size, focused }) => (
-              <LayoutDashboard color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
+              <Briefcase color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
             ),
           }}
         />
