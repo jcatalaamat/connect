@@ -1,6 +1,6 @@
 import { XStack, YStack, H3, Button, Text, Sheet, Separator, Anchor } from '@my/ui'
 import { useRouter } from 'solito/navigation'
-import { Menu, X, Home, Calendar, User, LayoutDashboard, Shield, LogIn, UserPlus, Settings } from '@tamagui/lucide-icons'
+import { Menu, X, Compass, CalendarCheck, User, LayoutDashboard, Shield, LogIn, UserPlus, Settings } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { useCity } from 'app/provider/city'
@@ -23,22 +23,16 @@ export function NavHeader() {
 
   const navItems: NavItem[] = [
     {
-      label: city ? city.name : 'Browse',
+      label: city ? city.name : 'Explore',
       href: citySlug ? `/${citySlug}` : '/',
-      icon: <Home size={18} />,
+      icon: <Compass size={18} />,
       show: true,
     },
     {
-      label: 'Bookings',
+      label: 'My Bookings',
       href: '/booking/lookup',
-      icon: <Calendar size={18} />,
+      icon: <CalendarCheck size={18} />,
       show: true,
-    },
-    {
-      label: 'Become a Practitioner',
-      href: '/practitioner/onboarding',
-      icon: <UserPlus size={18} />,
-      show: isAuthenticated && !isPractitioner,
     },
     {
       label: 'Dashboard',
@@ -51,6 +45,12 @@ export function NavHeader() {
       href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin',
       icon: <Shield size={18} />,
       show: isAdmin && !!adminCitySlug,
+    },
+    {
+      label: 'Become a Practitioner',
+      href: '/practitioner/onboarding',
+      icon: <UserPlus size={18} />,
+      show: isAuthenticated && !isPractitioner,
     },
     {
       label: 'Profile',

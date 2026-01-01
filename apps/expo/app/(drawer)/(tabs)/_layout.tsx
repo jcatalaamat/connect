@@ -1,6 +1,6 @@
 import { useTheme, Button } from '@my/ui'
 import { DrawerActions } from '@react-navigation/native'
-import { Home, Menu, Calendar, LayoutDashboard, Shield, User } from '@tamagui/lucide-icons'
+import { Compass, Menu, CalendarCheck, LayoutDashboard, Shield, User } from '@tamagui/lucide-icons'
 import { Stack, Tabs, useNavigation } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useUserRole } from 'app/hooks'
@@ -55,26 +55,26 @@ export default function Layout() {
           },
         }}
       >
-        {/* Browse Tab - Always visible */}
+        {/* Explore Tab - Always visible */}
         <Tabs.Screen
           name="index"
           options={{
             headerShown: false,
-            title: 'Browse',
+            title: 'Explore',
             tabBarIcon: ({ size, focused }) => (
-              <Home color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
+              <Compass color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
             ),
           }}
         />
 
-        {/* Bookings Tab - Always visible */}
+        {/* My Bookings Tab - Always visible */}
         <Tabs.Screen
           name="bookings"
           options={{
             headerShown: false,
-            title: 'Bookings',
+            title: 'My Bookings',
             tabBarIcon: ({ size, focused }) => (
-              <Calendar color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
+              <CalendarCheck color={focused ? '$blue10' : '$gray10'} size={size} strokeWidth={2} />
             ),
           }}
         />

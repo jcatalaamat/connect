@@ -1,6 +1,6 @@
 import { Avatar, Button, Paragraph, Separator, Settings, Text, XStack, YStack, getTokens, useWindowDimensions } from '@my/ui'
 import { DrawerContentScrollView } from '@react-navigation/drawer'
-import { Calendar, Cog, Home, LayoutDashboard, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
+import { CalendarCheck, Cog, Compass, LayoutDashboard, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
 import { useCity } from 'app/provider/city'
 import { useUserRole } from 'app/hooks'
 import { useSafeAreaInsets } from 'app/utils/useSafeAreaInsets'
@@ -19,8 +19,8 @@ export function DrawerMenu(props) {
   const height = useWindowDimensions().height
 
   // All useLink calls at the top to maintain consistent hook order
-  const browseLink = useLink({ href: '/' })
-  const bookingLookupLink = useLink({ href: '/booking/lookup' })
+  const exploreLink = useLink({ href: '/' })
+  const bookingsLink = useLink({ href: '/booking/lookup' })
   const dashboardLink = useLink({ href: '/practitioner/dashboard' })
   const adminLink = useLink({ href: adminCitySlug ? `/admin/${adminCitySlug}` : '/admin/mallorca' })
   const onboardingLink = useLink({ href: '/practitioner/onboarding' })
@@ -68,18 +68,18 @@ export function DrawerMenu(props) {
             {/* Main Navigation */}
             <Settings.Group>
               <Settings.Item
-                icon={Home}
-                {...browseLink}
+                icon={Compass}
+                {...exploreLink}
                 accentTheme="blue"
               >
-                Browse
+                Explore
               </Settings.Item>
               <Settings.Item
-                icon={Calendar}
-                {...bookingLookupLink}
+                icon={CalendarCheck}
+                {...bookingsLink}
                 accentTheme="green"
               >
-                Find Booking
+                My Bookings
               </Settings.Item>
             </Settings.Group>
 
@@ -91,7 +91,7 @@ export function DrawerMenu(props) {
                   {...dashboardLink}
                   accentTheme="purple"
                 >
-                  My Dashboard
+                  Dashboard
                 </Settings.Item>
               </Settings.Group>
             )}
@@ -104,7 +104,7 @@ export function DrawerMenu(props) {
                   {...adminLink}
                   accentTheme="orange"
                 >
-                  City Admin
+                  Admin
                 </Settings.Item>
               </Settings.Group>
             )}
@@ -131,7 +131,7 @@ export function DrawerMenu(props) {
                     {...profileEditLink}
                     accentTheme="gray"
                   >
-                    Edit Profile
+                    Profile
                   </Settings.Item>
                   <Settings.Item {...settingsLink} icon={Cog}>
                     Settings
