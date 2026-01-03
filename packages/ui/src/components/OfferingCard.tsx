@@ -5,6 +5,7 @@ import {
   Card,
   type CardProps,
   H5,
+  Image,
   Paragraph,
   XStack,
   YStack,
@@ -51,6 +52,7 @@ export const OfferingCard = ({
   durationMinutes,
   capacity,
   locationType,
+  coverImageUrl,
   category,
   isActive = true,
   linkProps,
@@ -68,18 +70,26 @@ export const OfferingCard = ({
   return (
     <Card
       cursor="pointer"
-      gap="$3"
-      p="$4"
+      gap="$0"
       borderRadius="$4"
       chromeless={!hover}
       onHoverIn={() => setHover(true)}
       onHoverOut={() => setHover(false)}
       onPress={onPress}
       opacity={isActive ? 1 : 0.6}
+      overflow="hidden"
       {...linkProps}
       {...props}
     >
-      <YStack gap="$3">
+      {coverImageUrl && (
+        <Image
+          source={{ uri: coverImageUrl, width: 400, height: 200 }}
+          width="100%"
+          height={160}
+          resizeMode="cover"
+        />
+      )}
+      <YStack gap="$3" p="$4">
         <XStack jc="space-between" ai="flex-start">
           <YStack f={1} gap="$1">
             <XStack gap="$2" ai="center" flexWrap="wrap">
