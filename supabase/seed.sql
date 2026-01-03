@@ -11,6 +11,12 @@ DELETE FROM availability_slots WHERE offering_id IN (SELECT id FROM offerings WH
 DELETE FROM event_dates WHERE offering_id IN (SELECT id FROM offerings WHERE practitioner_id = '7f3a1b89-113f-459d-853b-dd8902b357f9');
 DELETE FROM offerings WHERE practitioner_id = '7f3a1b89-113f-459d-853b-dd8902b357f9';
 
+-- Update practitioner with avatar and cover image
+UPDATE practitioners SET
+  avatar_url = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
+  cover_image_url = 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80'
+WHERE id = '7f3a1b89-113f-459d-853b-dd8902b357f9';
+
 -- ============================================
 -- OFFERINGS: Sessions (1:1 Services)
 -- ============================================

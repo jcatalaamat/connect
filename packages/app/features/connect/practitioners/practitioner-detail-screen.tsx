@@ -37,7 +37,8 @@ export function PractitionerDetailScreen({
 
   // Get practitioner
   const { data: practitioner, isLoading } = api.practitioners.getBySlug.useQuery({
-    slug: practitionerSlug,
+    citySlug,
+    practitionerSlug,
   })
 
   // Get offerings
