@@ -1,8 +1,10 @@
-import { YStack, XStack, H1, H2, Text, Card, Spinner, Image } from '@my/ui'
+import { YStack, XStack, H1, H2, Text, Card, Spinner, Image, Input } from '@my/ui'
+import { Search } from '@tamagui/lucide-icons'
 import { api } from 'app/utils/api'
 import { useCity } from 'app/provider/city'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/navigation'
+import { useState, useMemo } from 'react'
 
 // City card component
 function CityCard({
@@ -78,6 +80,23 @@ export function CitySelectorScreen() {
   const { data: cities, isLoading, error } = api.cities.list.useQuery()
   const { setCity } = useCity()
   const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // Filter cities based on search query
+  const filteredCities = useMemo(() => {
+    if (!cities) return []
+    if (!searchQuery.trim()) return cities
+
+    const query = searchQuery.toLowerCase().trim()
+    return cities.filter(
+      (city) =>
+        city.name.toLowerCase().includes(query) ||
+        city.country.toLowerCase().includes(query)
+    )
+  }, [cities, searchQuery])
+
+  // Show search when there are many cities
+  const showSearch = cities && cities.length > 6
 
   const handleSelectCity = (city: { id: string; slug: string; name: string; country: string }) => {
     setCity(city)
@@ -121,10 +140,30 @@ export function CitySelectorScreen() {
         </Text>
       </YStack>
 
-      <YStack gap="$2" alignItems="center">
+      <YStack gap="$3" alignItems="center" width="100%" maxWidth={500} alignSelf="center">
         <Text size="$4" fontWeight="600">
           Choose your city
         </Text>
+
+        {showSearch && (
+          <XStack
+            width="100%"
+            paddingHorizontal="$4"
+            alignItems="center"
+            gap="$2"
+          >
+            <Input
+              flex={1}
+              size="$4"
+              placeholder="Search cities..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Search size={20} color="$gray10" />
+          </XStack>
+        )}
       </YStack>
 
       <XStack
@@ -133,7 +172,7 @@ export function CitySelectorScreen() {
         gap="$4"
         paddingHorizontal="$4"
       >
-        {cities?.map((city) => (
+        {filteredCities.map((city) => (
           <CityCard
             key={city.id}
             id={city.id}
@@ -152,7 +191,13 @@ export function CitySelectorScreen() {
         ))}
       </XStack>
 
-      {(!cities || cities.length === 0) && (
+      {filteredCities.length === 0 && searchQuery && (
+        <YStack alignItems="center" padding="$8">
+          <Text theme="alt2">No cities match "{searchQuery}"</Text>
+        </YStack>
+      )}
+
+      {(!cities || cities.length === 0) && !searchQuery && (
         <YStack alignItems="center" padding="$8">
           <Text theme="alt2">No cities available yet</Text>
         </YStack>
