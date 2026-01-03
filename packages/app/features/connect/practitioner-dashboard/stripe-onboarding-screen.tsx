@@ -10,12 +10,13 @@ export function StripeOnboardingScreen() {
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   // Check if user has a practitioner profile
-  const { data: profile, isLoading: profileLoading } = api.practitioners.getMyProfile.useQuery()
+  const { data: profile, isLoading: profileLoading, error: profileError } = api.practitioners.getMyProfile.useQuery()
 
   // Get Stripe account status
   const {
     data: stripeStatus,
     isLoading: statusLoading,
+    error: statusError,
     refetch: refetchStatus,
   } = api.payments.getAccountStatus.useQuery(undefined, {
     enabled: !!profile,
@@ -54,6 +55,34 @@ export function StripeOnboardingScreen() {
       <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
         <Spinner size="large" />
         <Text marginTop="$4">Loading...</Text>
+      </YStack>
+    )
+  }
+
+  // Show error if not authenticated
+  if (profileError) {
+    return (
+      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$4">
+        <AlertCircle size={48} color="$red10" />
+        <Text size="$5" fontWeight="600">Please sign in</Text>
+        <Text theme="alt2" textAlign="center">
+          You need to be signed in to access Stripe setup.
+        </Text>
+        <Button onPress={() => router.push('/sign-in')}>Sign In</Button>
+      </YStack>
+    )
+  }
+
+  // Show error if Stripe API fails
+  if (statusError) {
+    return (
+      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$4">
+        <AlertCircle size={48} color="$orange10" />
+        <Text size="$5" fontWeight="600">Stripe Error</Text>
+        <Text theme="alt2" textAlign="center">
+          {statusError.message || 'Failed to connect to Stripe. Please try again later.'}
+        </Text>
+        <Button onPress={() => refetchStatus()}>Retry</Button>
       </YStack>
     )
   }
