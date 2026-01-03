@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ScrollView } from 'react-native'
 import { YStack, XStack, H1, Text, Button, Spinner, Input, Tabs } from '@my/ui'
 import { PractitionerCard, OfferingCard } from '@my/ui'
@@ -10,34 +10,59 @@ import { CitySelectorScreen } from '../city/city-selector-screen'
 
 type TabValue = 'events' | 'services' | 'practitioners'
 
-export function BrowseScreen() {
+interface BrowseScreenProps {
+  citySlug?: string
+}
+
+export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {}) {
   const router = useRouter()
-  const { city } = useCity()
+  const { city, setCity } = useCity()
   const [activeTab, setActiveTab] = useState<TabValue>('events')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
+  // Use prop citySlug or fall back to context city
+  const effectiveCitySlug = propCitySlug || city?.slug
+
+  // If we have a citySlug prop but no city in context, fetch and set the city
+  const { data: cityData } = api.cities.getBySlug.useQuery(
+    { slug: propCitySlug! },
+    { enabled: !!propCitySlug && (!city || city.slug !== propCitySlug) }
+  )
+
+  // Set city in context when loaded from URL
+  useEffect(() => {
+    if (cityData && (!city || city.slug !== cityData.slug)) {
+      setCity({
+        id: cityData.id,
+        slug: cityData.slug,
+        name: cityData.name,
+        country: cityData.country,
+      })
+    }
+  }, [cityData, city, setCity])
+
   // Get events for selected city
   const { data: eventsData, isLoading: eventsLoading } = api.offerings.listByCity.useQuery(
     {
-      citySlug: city?.slug || '',
+      citySlug: effectiveCitySlug || '',
       type: 'event',
       category: selectedCategory || undefined,
       limit: 50,
     },
-    { enabled: !!city?.slug }
+    { enabled: !!effectiveCitySlug }
   )
 
   // Get services (sessions) for selected city
   const { data: servicesData, isLoading: servicesLoading } = api.offerings.listByCity.useQuery(
     {
-      citySlug: city?.slug || '',
+      citySlug: effectiveCitySlug || '',
       type: 'session',
       category: selectedCategory || undefined,
       limit: 50,
     },
-    { enabled: !!city?.slug }
+    { enabled: !!effectiveCitySlug }
   )
 
   // Get specialties for filtering practitioners
@@ -49,11 +74,11 @@ export function BrowseScreen() {
   // Get practitioners for selected city
   const { data: practitionersData, isLoading: practitionersLoading } = api.practitioners.listByCity.useQuery(
     {
-      citySlug: city?.slug || '',
+      citySlug: effectiveCitySlug || '',
       specialty: selectedSpecialty || undefined,
       limit: 50,
     },
-    { enabled: !!city?.slug }
+    { enabled: !!effectiveCitySlug }
   )
 
   // Filter offerings by search query
@@ -92,10 +117,13 @@ export function BrowseScreen() {
     (activeTab === 'services' && servicesLoading) ||
     (activeTab === 'practitioners' && practitionersLoading)
 
-  // If no city selected, show the city selector
-  if (!city) {
+  // If no city selected and no citySlug prop, show the city selector
+  if (!effectiveCitySlug) {
     return <CitySelectorScreen />
   }
+
+  // Get the display name - from context or fetched data
+  const cityName = city?.name || cityData?.name || ''
 
   const searchPlaceholder =
     activeTab === 'events'
@@ -109,7 +137,7 @@ export function BrowseScreen() {
       <ScrollView>
         <YStack padding="$4" gap="$4">
           {/* Header */}
-          <H1 size="$8">Browse {city.name}</H1>
+          <H1 size="$8">Browse {cityName}</H1>
 
           {/* Tabs */}
           <Tabs
@@ -361,7 +389,7 @@ export function BrowseScreen() {
                       bio={practitioner.bio}
                       avatarUrl={practitioner.avatar_url}
                       specialties={practitioner.specialties}
-                      onPress={() => router.push(`/${city?.slug}/${practitioner.slug}`)}
+                      onPress={() => router.push(`/${effectiveCitySlug}/${practitioner.slug}`)}
                     />
                   ))}
                 </>

@@ -1,4 +1,4 @@
-import { CityHomeScreen } from 'app/features/connect/city'
+import { BrowseScreen } from 'app/features/connect/browse'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
@@ -15,7 +15,7 @@ export default function CityHomePage() {
       <Head>
         <title>Connect</title>
       </Head>
-      <CityHomeScreen citySlug={citySlug} />
+      <BrowseScreen citySlug={citySlug} />
     </>
   )
 }
