@@ -192,7 +192,7 @@ export function NavHeader() {
         onPress={handleLogoClick}
         paddingHorizontal="$2"
       >
-        <H3 fontWeight="700">Connect</H3>
+        <H3 fontWeight="700">{city ? `${city.name} Connection` : 'Community Connection'}</H3>
       </Button>
 
       {/* Navigation */}

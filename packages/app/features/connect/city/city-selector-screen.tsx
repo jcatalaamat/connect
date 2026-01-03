@@ -133,7 +133,7 @@ export function CitySelectorScreen() {
     <YStack flex={1} padding="$4" gap="$6">
       <YStack gap="$2" alignItems="center" paddingTop="$8">
         <H1 size="$9" textAlign="center">
-          Connect
+          Community Connection
         </H1>
         <Text size="$5" theme="alt2" textAlign="center">
           Book local wellness sessions & events
