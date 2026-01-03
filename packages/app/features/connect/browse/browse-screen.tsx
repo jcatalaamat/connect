@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react'
 import { ScrollView } from 'react-native'
-import { YStack, XStack, H1, Text, Button, Spinner, Input, Tabs } from '@my/ui'
+import { YStack, XStack, H1, Text, Button, Spinner, Input, Tabs, ScrollView as TamaguiScrollView } from '@my/ui'
 import { PractitionerCard, OfferingCard } from '@my/ui'
 import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
 import { useCity } from 'app/provider/city'
-import { Search, Calendar, Briefcase, Users } from '@tamagui/lucide-icons'
+import { Search, Calendar, Briefcase, Users, Clock } from '@tamagui/lucide-icons'
 import { CitySelectorScreen } from '../city/city-selector-screen'
 
 type TabValue = 'events' | 'services' | 'practitioners'
+type TimeFilter = 'today' | 'this_week' | 'next_7_days' | 'next_30_days' | 'happening_now'
+
+const TIME_FILTERS: { value: TimeFilter; label: string }[] = [
+  { value: 'happening_now', label: 'Happening Now' },
+  { value: 'today', label: 'Today' },
+  { value: 'this_week', label: 'This Week' },
+  { value: 'next_7_days', label: 'Next 7 Days' },
+  { value: 'next_30_days', label: 'Next 30 Days' },
+]
 
 interface BrowseScreenProps {
   citySlug?: string
@@ -21,6 +30,7 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedTimeFilter, setSelectedTimeFilter] = useState<TimeFilter | null>(null)
 
   // Use prop citySlug or fall back to context city
   const effectiveCitySlug = propCitySlug || city?.slug
@@ -49,6 +59,7 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
       citySlug: effectiveCitySlug || '',
       type: 'event',
       category: selectedCategory || undefined,
+      timeFilter: selectedTimeFilter || undefined,
       limit: 50,
     },
     { enabled: !!effectiveCitySlug }
@@ -147,6 +158,7 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
               setSearchQuery('')
               setSelectedSpecialty(null)
               setSelectedCategory(null)
+              setSelectedTimeFilter(null)
             }}
             orientation="horizontal"
             flexDirection="column"
@@ -195,6 +207,38 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
               onChangeText={setSearchQuery}
             />
           </XStack>
+
+          {/* Time Filters - only for events tab */}
+          {activeTab === 'events' && (
+            <XStack gap="$2">
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <XStack gap="$2" paddingRight="$4">
+                  <Button
+                    size="$2"
+                    borderRadius="$10"
+                    theme={!selectedTimeFilter ? 'active' : undefined}
+                    variant={selectedTimeFilter ? 'outlined' : undefined}
+                    onPress={() => setSelectedTimeFilter(null)}
+                    icon={<Clock size={14} />}
+                  >
+                    All Times
+                  </Button>
+                  {TIME_FILTERS.map((filter) => (
+                    <Button
+                      key={filter.value}
+                      size="$2"
+                      borderRadius="$10"
+                      theme={selectedTimeFilter === filter.value ? 'active' : undefined}
+                      variant={selectedTimeFilter !== filter.value ? 'outlined' : undefined}
+                      onPress={() => setSelectedTimeFilter(filter.value === selectedTimeFilter ? null : filter.value)}
+                    >
+                      {filter.label}
+                    </Button>
+                  ))}
+                </XStack>
+              </ScrollView>
+            </XStack>
+          )}
 
           {/* Category Filters - for events and services tabs */}
           {(activeTab === 'events' || activeTab === 'services') && categories && categories.length > 0 && (
@@ -294,16 +338,17 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
                     No events found
                   </Text>
                   <Text textAlign="center" theme="alt2">
-                    {searchQuery || selectedCategory
+                    {searchQuery || selectedCategory || selectedTimeFilter
                       ? 'Try adjusting your search or filters'
                       : 'No events are scheduled in this area yet'}
                   </Text>
-                  {(searchQuery || selectedCategory) && (
+                  {(searchQuery || selectedCategory || selectedTimeFilter) && (
                     <Button
                       variant="outlined"
                       onPress={() => {
                         setSearchQuery('')
                         setSelectedCategory(null)
+                        setSelectedTimeFilter(null)
                       }}
                     >
                       Clear Filters

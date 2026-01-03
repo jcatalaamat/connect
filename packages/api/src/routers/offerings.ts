@@ -57,6 +57,45 @@ const addEventDateInput = z.object({
   capacityOverride: z.number().int().min(1).optional(),
 })
 
+// Helper to calculate time boundaries for filters
+function getTimeBoundaries(filter: 'today' | 'this_week' | 'next_7_days' | 'next_30_days' | 'happening_now') {
+  const now = new Date()
+
+  switch (filter) {
+    case 'today': {
+      const startOfDay = new Date(now)
+      startOfDay.setHours(0, 0, 0, 0)
+      const endOfDay = new Date(now)
+      endOfDay.setHours(23, 59, 59, 999)
+      return { start: startOfDay.toISOString(), end: endOfDay.toISOString() }
+    }
+    case 'this_week': {
+      const startOfWeek = new Date(now)
+      const day = startOfWeek.getDay()
+      const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1) // Monday
+      startOfWeek.setDate(diff)
+      startOfWeek.setHours(0, 0, 0, 0)
+      const endOfWeek = new Date(startOfWeek)
+      endOfWeek.setDate(endOfWeek.getDate() + 6)
+      endOfWeek.setHours(23, 59, 59, 999)
+      return { start: startOfWeek.toISOString(), end: endOfWeek.toISOString() }
+    }
+    case 'next_7_days': {
+      const end = new Date(now)
+      end.setDate(end.getDate() + 7)
+      return { start: now.toISOString(), end: end.toISOString() }
+    }
+    case 'next_30_days': {
+      const end = new Date(now)
+      end.setDate(end.getDate() + 30)
+      return { start: now.toISOString(), end: end.toISOString() }
+    }
+    case 'happening_now': {
+      return { start: now.toISOString(), end: now.toISOString(), isNow: true }
+    }
+  }
+}
+
 export const offeringsRouter = createTRPCRouter({
   // Browse offerings by city (public) - for events/sessions discovery
   listByCity: publicProcedure
@@ -65,6 +104,7 @@ export const offeringsRouter = createTRPCRouter({
         citySlug: z.string(),
         type: z.enum(['session', 'event']).optional(),
         category: z.string().optional(),
+        timeFilter: z.enum(['today', 'this_week', 'next_7_days', 'next_30_days', 'happening_now']).optional(),
         limit: z.number().min(1).max(100).default(20),
         offset: z.number().min(0).default(0),
       })
@@ -93,6 +133,42 @@ export const offeringsRouter = createTRPCRouter({
       }
 
       const practitionerIds = practitioners.map((p) => p.id)
+
+      // If time filter is applied for events, we need to filter by event_dates first
+      let eventOfferingIds: string[] | null = null
+      if (input.timeFilter && (input.type === 'event' || !input.type)) {
+        const bounds = getTimeBoundaries(input.timeFilter)
+
+        let eventDatesQuery = ctx.supabase
+          .from('event_dates')
+          .select('offering_id')
+          .gt('spots_remaining', 0)
+
+        if ((bounds as any).isNow) {
+          // Happening now: start_time <= now AND end_time >= now
+          eventDatesQuery = eventDatesQuery
+            .lte('start_time', bounds.start)
+            .gte('end_time', bounds.end)
+        } else {
+          // Time range filter
+          eventDatesQuery = eventDatesQuery
+            .gte('start_time', bounds.start)
+            .lte('start_time', bounds.end)
+        }
+
+        const { data: eventDates } = await eventDatesQuery
+
+        if (eventDates && eventDates.length > 0) {
+          // Get unique offering IDs
+          eventOfferingIds = [...new Set(eventDates.map((ed) => ed.offering_id))]
+        } else {
+          // No matching event dates - return empty if filtering for events only
+          if (input.type === 'event') {
+            return { offerings: [], total: 0, hasMore: false }
+          }
+          eventOfferingIds = [] // Empty array means no events match
+        }
+      }
 
       // Build query for offerings
       let query = ctx.supabase
@@ -129,6 +205,14 @@ export const offeringsRouter = createTRPCRouter({
 
       if (input.type) {
         query = query.eq('type', input.type)
+      }
+
+      // Apply time filter results for events
+      if (eventOfferingIds !== null && eventOfferingIds.length > 0) {
+        query = query.in('id', eventOfferingIds)
+      } else if (eventOfferingIds !== null && eventOfferingIds.length === 0 && input.type === 'event') {
+        // No matching events - already handled above but safety check
+        return { offerings: [], total: 0, hasMore: false }
       }
 
       if (input.category) {
