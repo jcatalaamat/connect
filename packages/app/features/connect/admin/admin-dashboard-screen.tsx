@@ -9,10 +9,15 @@ import {
   Clock,
   Settings,
   ChevronRight,
+  MapPin,
+  Check,
+  X,
 } from '@tamagui/lucide-icons'
+import { useState } from 'react'
 
 export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
   const router = useRouter()
+  const [showAllRequests, setShowAllRequests] = useState(false)
 
   // Get city info
   const { data: city, isLoading: loadingCity } = api.cities.getBySlug.useQuery({ slug: citySlug })
@@ -25,6 +30,19 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
     { cityId: city?.id || '' },
     { enabled: !!city?.id }
   )
+
+  // Get city requests (pending by default)
+  const { data: cityRequests, isLoading: loadingRequests, refetch: refetchRequests } = api.cities.listRequests.useQuery(
+    { status: showAllRequests ? undefined : 'pending', limit: 10 },
+    { enabled: !!adminCities && adminCities.length > 0 }
+  )
+
+  // Mutation to update request status
+  const updateRequestMutation = api.cities.updateRequestStatus.useMutation({
+    onSuccess: () => {
+      refetchRequests()
+    },
+  })
 
   const practitionersLink = useLink({ href: `/admin/${citySlug}/practitioners` })
   const settingsLink = useLink({ href: `/admin/${citySlug}/settings` })
@@ -209,7 +227,127 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
             </XStack>
           </XStack>
         </YStack>
-        </Card>
+      </Card>
+
+      {/* City Requests */}
+      <YStack gap="$4">
+        <XStack justifyContent="space-between" alignItems="center">
+          <XStack gap="$2" alignItems="center">
+            <MapPin size={20} color="$blue10" />
+            <H2 size="$5">City Requests</H2>
+          </XStack>
+          <Button
+            size="$2"
+            variant="outlined"
+            onPress={() => setShowAllRequests(!showAllRequests)}
+          >
+            {showAllRequests ? 'Show Pending' : 'Show All'}
+          </Button>
+        </XStack>
+
+        {loadingRequests ? (
+          <XStack justifyContent="center" padding="$4">
+            <Spinner />
+          </XStack>
+        ) : cityRequests?.requests && cityRequests.requests.length > 0 ? (
+          <YStack gap="$3">
+            {cityRequests.requests.map((request) => (
+              <Card key={request.id} bordered padding="$4">
+                <YStack gap="$3">
+                  <XStack justifyContent="space-between" alignItems="flex-start">
+                    <YStack gap="$1">
+                      <Text fontWeight="600" size="$5">
+                        {request.city_name}
+                      </Text>
+                      <Text theme="alt2" size="$3">
+                        {request.country}
+                      </Text>
+                    </YStack>
+                    <YStack
+                      paddingHorizontal="$2"
+                      paddingVertical="$1"
+                      borderRadius="$2"
+                      backgroundColor={
+                        request.status === 'pending'
+                          ? '$yellow3'
+                          : request.status === 'approved'
+                            ? '$green3'
+                            : '$red3'
+                      }
+                    >
+                      <Text
+                        size="$1"
+                        color={
+                          request.status === 'pending'
+                            ? '$yellow11'
+                            : request.status === 'approved'
+                              ? '$green11'
+                              : '$red11'
+                        }
+                        fontWeight="600"
+                        textTransform="capitalize"
+                      >
+                        {request.status}
+                      </Text>
+                    </YStack>
+                  </XStack>
+
+                  {request.email && (
+                    <Text size="$2" theme="alt2">
+                      Contact: {request.email}
+                    </Text>
+                  )}
+
+                  <Text size="$1" theme="alt2">
+                    Requested: {new Date(request.created_at).toLocaleDateString()}
+                  </Text>
+
+                  {request.status === 'pending' && (
+                    <XStack gap="$2" marginTop="$2">
+                      <Button
+                        size="$3"
+                        theme="green"
+                        icon={Check}
+                        disabled={updateRequestMutation.isPending}
+                        onPress={() =>
+                          updateRequestMutation.mutate({
+                            requestId: request.id,
+                            status: 'approved',
+                          })
+                        }
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="$3"
+                        theme="red"
+                        variant="outlined"
+                        icon={X}
+                        disabled={updateRequestMutation.isPending}
+                        onPress={() =>
+                          updateRequestMutation.mutate({
+                            requestId: request.id,
+                            status: 'rejected',
+                          })
+                        }
+                      >
+                        Reject
+                      </Button>
+                    </XStack>
+                  )}
+                </YStack>
+              </Card>
+            ))}
+          </YStack>
+        ) : (
+          <Card bordered padding="$6" alignItems="center" gap="$2">
+            <MapPin size={32} color="$gray8" />
+            <Text theme="alt2" textAlign="center">
+              {showAllRequests ? 'No city requests yet' : 'No pending requests'}
+            </Text>
+          </Card>
+        )}
+      </YStack>
       </YStack>
     </ScrollView>
   )

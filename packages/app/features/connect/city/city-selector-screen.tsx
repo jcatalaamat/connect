@@ -91,27 +91,37 @@ function CityCard({
 function RequestCitySheet({
   open,
   onOpenChange,
+  initialCityName,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
+  initialCityName?: string
 }) {
-  const [cityName, setCityName] = useState('')
+  const [cityName, setCityName] = useState(initialCityName || '')
   const [country, setCountry] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
+  const requestCityMutation = api.cities.requestCity.useMutation({
+    onSuccess: () => {
+      setSubmitted(true)
+    },
+  })
+
   const handleSubmit = () => {
-    // In production, this would send to an API
-    console.log('City request:', { cityName, country })
-    setSubmitted(true)
+    requestCityMutation.mutate({
+      cityName: cityName.trim(),
+      country: country.trim(),
+    })
   }
 
   const handleClose = () => {
     onOpenChange(false)
     // Reset after animation
     setTimeout(() => {
-      setCityName('')
+      setCityName(initialCityName || '')
       setCountry('')
       setSubmitted(false)
+      requestCityMutation.reset()
     }, 300)
   }
 
@@ -170,12 +180,18 @@ function RequestCitySheet({
               />
             </YStack>
 
+            {requestCityMutation.isError && (
+              <Text color="$red10" size="$2">
+                Failed to submit request. Please try again.
+              </Text>
+            )}
+
             <Button
               theme="green"
-              disabled={!cityName.trim() || !country.trim()}
+              disabled={!cityName.trim() || !country.trim() || requestCityMutation.isPending}
               onPress={handleSubmit}
             >
-              Submit Request
+              {requestCityMutation.isPending ? 'Submitting...' : 'Submit Request'}
             </Button>
           </YStack>
         )}
@@ -337,6 +353,7 @@ export function CitySelectorScreen() {
       <RequestCitySheet
         open={requestSheetOpen}
         onOpenChange={setRequestSheetOpen}
+        initialCityName={searchQuery}
       />
     </YStack>
   )

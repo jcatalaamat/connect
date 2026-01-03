@@ -296,6 +296,60 @@ export type Database = {
           },
         ]
       }
+      city_requests: {
+        Row: {
+          city_name: string
+          country: string
+          created_at: string
+          email: string | null
+          id: string
+          notes: string | null
+          profile_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          city_name: string
+          country: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          profile_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          city_name?: string
+          country?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          profile_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "city_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "city_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_dates: {
         Row: {
           capacity_override: number | null
