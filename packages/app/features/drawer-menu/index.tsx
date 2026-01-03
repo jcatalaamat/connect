@@ -1,6 +1,6 @@
 import { Avatar, Button, Paragraph, Separator, Settings, Text, XStack, YStack, getTokens, useWindowDimensions } from '@my/ui'
 import { DrawerContentScrollView, DrawerActions } from '@react-navigation/drawer'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, DrawerActions as NavDrawerActions } from '@react-navigation/native'
 import { Briefcase, CalendarCheck, Cog, Compass, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
 import { useCity } from 'app/provider/city'
 import { useUserRole } from 'app/hooks'
@@ -35,7 +35,16 @@ export function DrawerMenu(props) {
   }
 
   const handleChangeCity = () => {
-    navigation.dispatch(DrawerActions.closeDrawer())
+    // Try to close the drawer, but don't fail if it's not available
+    try {
+      if (props.navigation?.closeDrawer) {
+        props.navigation.closeDrawer()
+      } else {
+        navigation.dispatch(DrawerActions.closeDrawer())
+      }
+    } catch (e) {
+      // Drawer close failed, continue anyway
+    }
     clearCity()
   }
 
