@@ -242,55 +242,63 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
 
           {/* Category Filters - for events and services tabs */}
           {(activeTab === 'events' || activeTab === 'services') && categories && categories.length > 0 && (
-            <XStack gap="$2" flexWrap="wrap">
-              <Button
-                size="$2"
-                borderRadius="$10"
-                theme={!selectedCategory ? 'active' : undefined}
-                variant={selectedCategory ? 'outlined' : undefined}
-                onPress={() => setSelectedCategory(null)}
-              >
-                All
-              </Button>
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  size="$2"
-                  borderRadius="$10"
-                  theme={selectedCategory === category ? 'active' : undefined}
-                  variant={selectedCategory !== category ? 'outlined' : undefined}
-                  onPress={() => setSelectedCategory(category === selectedCategory ? null : category)}
-                >
-                  {category}
-                </Button>
-              ))}
+            <XStack gap="$2">
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <XStack gap="$2" paddingRight="$4">
+                  <Button
+                    size="$2"
+                    borderRadius="$10"
+                    theme={!selectedCategory ? 'active' : undefined}
+                    variant={selectedCategory ? 'outlined' : undefined}
+                    onPress={() => setSelectedCategory(null)}
+                  >
+                    All Categories
+                  </Button>
+                  {categories.map((category) => (
+                    <Button
+                      key={category}
+                      size="$2"
+                      borderRadius="$10"
+                      theme={selectedCategory === category ? 'active' : undefined}
+                      variant={selectedCategory !== category ? 'outlined' : undefined}
+                      onPress={() => setSelectedCategory(category === selectedCategory ? null : category)}
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </XStack>
+              </ScrollView>
             </XStack>
           )}
 
           {/* Specialty Filters - only for practitioners tab */}
           {activeTab === 'practitioners' && specialties && specialties.length > 0 && (
-            <XStack gap="$2" flexWrap="wrap">
-              <Button
-                size="$2"
-                borderRadius="$10"
-                theme={!selectedSpecialty ? 'active' : undefined}
-                variant={selectedSpecialty ? 'outlined' : undefined}
-                onPress={() => setSelectedSpecialty(null)}
-              >
-                All
-              </Button>
-              {specialties.map((specialty) => (
-                <Button
-                  key={specialty}
-                  size="$2"
-                  borderRadius="$10"
-                  theme={selectedSpecialty === specialty ? 'active' : undefined}
-                  variant={selectedSpecialty !== specialty ? 'outlined' : undefined}
-                  onPress={() => setSelectedSpecialty(specialty === selectedSpecialty ? null : specialty)}
-                >
-                  {specialty}
-                </Button>
-              ))}
+            <XStack gap="$2">
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <XStack gap="$2" paddingRight="$4">
+                  <Button
+                    size="$2"
+                    borderRadius="$10"
+                    theme={!selectedSpecialty ? 'active' : undefined}
+                    variant={selectedSpecialty ? 'outlined' : undefined}
+                    onPress={() => setSelectedSpecialty(null)}
+                  >
+                    All Specialties
+                  </Button>
+                  {specialties.map((specialty) => (
+                    <Button
+                      key={specialty}
+                      size="$2"
+                      borderRadius="$10"
+                      theme={selectedSpecialty === specialty ? 'active' : undefined}
+                      variant={selectedSpecialty !== specialty ? 'outlined' : undefined}
+                      onPress={() => setSelectedSpecialty(specialty === selectedSpecialty ? null : specialty)}
+                    >
+                      {specialty}
+                    </Button>
+                  ))}
+                </XStack>
+              </ScrollView>
             </XStack>
           )}
 
