@@ -262,9 +262,25 @@ export function CitySelectorScreen() {
         </Text>
       </YStack>
 
+      {/* Show current city if selected */}
+      {currentCity && (
+        <Card bordered padding="$4" marginHorizontal="$4" alignSelf="center" maxWidth={500} width="100%">
+          <XStack gap="$3" alignItems="center">
+            <MapPin size={24} color="$green10" />
+            <YStack flex={1}>
+              <Text size="$2" theme="alt2">Currently browsing</Text>
+              <Text size="$5" fontWeight="600">{currentCity.name}</Text>
+            </YStack>
+            <Button size="$3" theme="green" onPress={() => router.push(`/${currentCity.slug}`)}>
+              Go to {currentCity.name}
+            </Button>
+          </XStack>
+        </Card>
+      )}
+
       <YStack gap="$3" alignItems="center" width="100%" maxWidth={500} alignSelf="center">
         <Text size="$4" fontWeight="600">
-          Choose your city
+          {currentCity ? 'Switch to a different city' : 'Choose your city'}
         </Text>
 
         <XStack
