@@ -6,6 +6,14 @@
 -- CITY ID (Mallorca): 30b4c1d0-4189-4b35-b865-745be538bed1
 -- ============================================
 
+-- ============================================
+-- CITY: Mallorca
+-- ============================================
+UPDATE cities SET
+  cover_image_url = 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80',
+  description = 'Discover wellness and healing on the beautiful Mediterranean island of Mallorca. From breathwork ceremonies in ancient fincas to sound healing on pristine beaches, connect with practitioners offering transformative experiences amidst stunning natural beauty.'
+WHERE slug = 'mallorca';
+
 -- Clear existing offerings, event_dates, availability_slots for this practitioner
 DELETE FROM availability_slots WHERE offering_id IN (SELECT id FROM offerings WHERE practitioner_id = '7f3a1b89-113f-459d-853b-dd8902b357f9');
 DELETE FROM event_dates WHERE offering_id IN (SELECT id FROM offerings WHERE practitioner_id = '7f3a1b89-113f-459d-853b-dd8902b357f9');
