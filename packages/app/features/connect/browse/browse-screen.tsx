@@ -1,36 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ScrollView } from 'react-native'
-import { YStack, XStack, H1, H2, Text, Button, Spinner, Input, Select, Adapt, Sheet, Tabs } from '@my/ui'
+import { YStack, XStack, H1, Text, Button, Spinner, Input, Tabs } from '@my/ui'
 import { PractitionerCard, OfferingCard } from '@my/ui'
 import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
 import { useCity } from 'app/provider/city'
-import { Search, MapPin, ChevronDown, Check, Calendar, Briefcase, Users } from '@tamagui/lucide-icons'
+import { Search, Calendar, Briefcase, Users } from '@tamagui/lucide-icons'
 
 type TabValue = 'events' | 'services' | 'practitioners'
 
 export function BrowseScreen() {
   const router = useRouter()
-  const { city, setCity } = useCity()
+  const { city } = useCity()
   const [activeTab, setActiveTab] = useState<TabValue>('events')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-
-  // Get all cities for dropdown
-  const { data: cities } = api.cities.list.useQuery()
-
-  // Auto-select first city if none selected
-  useEffect(() => {
-    if (!city && cities && cities.length > 0) {
-      setCity({
-        id: cities[0].id,
-        slug: cities[0].slug,
-        name: cities[0].name,
-        country: cities[0].country,
-      })
-    }
-  }, [cities, city, setCity])
 
   // Get events for selected city
   const { data: eventsData, isLoading: eventsLoading } = api.offerings.listByCity.useQuery(
@@ -101,27 +86,19 @@ export function BrowseScreen() {
     )
   })
 
-  const handleCityChange = (citySlug: string) => {
-    const selectedCity = cities?.find((c) => c.slug === citySlug)
-    if (selectedCity) {
-      setCity({
-        id: selectedCity.id,
-        slug: selectedCity.slug,
-        name: selectedCity.name,
-        country: selectedCity.country,
-      })
-    }
-  }
-
   const isLoading =
     (activeTab === 'events' && eventsLoading) ||
     (activeTab === 'services' && servicesLoading) ||
     (activeTab === 'practitioners' && practitionersLoading)
 
-  if (!cities) {
+  // If no city selected, show a message directing to city selector
+  if (!city) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
-        <Spinner size="large" />
+      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$4">
+        <Text size="$5" textAlign="center">Select a city to browse</Text>
+        <Text theme="alt2" textAlign="center">
+          Tap the logo in the header to choose your city
+        </Text>
       </YStack>
     )
   }
@@ -137,49 +114,8 @@ export function BrowseScreen() {
     <YStack flex={1}>
       <ScrollView>
         <YStack padding="$4" gap="$4">
-          {/* Header with City Selector */}
-          <YStack gap="$3">
-            <H1 size="$8">Browse</H1>
-
-            {/* City Selector */}
-            <XStack alignItems="center" gap="$2">
-              <MapPin size={18} color="$blue10" />
-              <Select value={city?.slug || ''} onValueChange={handleCityChange}>
-                <Select.Trigger width={220} iconAfter={ChevronDown}>
-                  <Select.Value placeholder="Select city" />
-                </Select.Trigger>
-
-                <Adapt when="sm" platform="touch">
-                  <Sheet modal dismissOnSnapToBottom snapPoints={[50]}>
-                    <Sheet.Frame>
-                      <Sheet.ScrollView>
-                        <Adapt.Contents />
-                      </Sheet.ScrollView>
-                    </Sheet.Frame>
-                    <Sheet.Overlay />
-                  </Sheet>
-                </Adapt>
-
-                <Select.Content zIndex={200000}>
-                  <Select.Viewport>
-                    <Select.Group>
-                      <Select.Label>Cities</Select.Label>
-                      {cities.map((c, i) => (
-                        <Select.Item key={c.id} index={i} value={c.slug}>
-                          <Select.ItemText>
-                            {c.name}, {c.country}
-                          </Select.ItemText>
-                          <Select.ItemIndicator marginLeft="auto">
-                            <Check size={16} />
-                          </Select.ItemIndicator>
-                        </Select.Item>
-                      ))}
-                    </Select.Group>
-                  </Select.Viewport>
-                </Select.Content>
-              </Select>
-            </XStack>
-          </YStack>
+          {/* Header */}
+          <H1 size="$8">Browse {city.name}</H1>
 
           {/* Tabs */}
           <Tabs
