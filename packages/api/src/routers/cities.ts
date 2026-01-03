@@ -169,14 +169,17 @@ export const citiesRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       // Check if user is an admin of any city
-      const { data: adminCheck } = await ctx.supabase
+      const { data: adminCheck, error: adminError } = await ctx.supabase
         .from('city_admins')
         .select('id')
         .eq('profile_id', ctx.user.id)
         .limit(1)
-        .single()
 
-      if (!adminCheck) {
+      if (adminError) {
+        console.error('Admin check failed:', adminError)
+      }
+
+      if (!adminCheck || adminCheck.length === 0) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Only city admins can view requests',
@@ -196,10 +199,9 @@ export const citiesRouter = createTRPCRouter({
           created_at,
           reviewed_at,
           profile_id,
-          profiles (
+          requester:profiles!city_requests_profile_id_fkey (
             id,
-            name,
-            email
+            name
           )
         `,
           { count: 'exact' }
@@ -214,6 +216,7 @@ export const citiesRouter = createTRPCRouter({
       const { data: requests, error, count } = await query
 
       if (error) {
+        console.error('Failed to fetch city requests:', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to fetch city requests',
@@ -229,6 +232,7 @@ export const citiesRouter = createTRPCRouter({
     }),
 
   // Update city request status (admin only)
+  // When approved, automatically creates the city and makes requester an admin
   updateRequestStatus: protectedProcedure
     .input(
       z.object({
@@ -244,15 +248,92 @@ export const citiesRouter = createTRPCRouter({
         .select('id')
         .eq('profile_id', ctx.user.id)
         .limit(1)
-        .single()
 
-      if (!adminCheck) {
+      if (!adminCheck || adminCheck.length === 0) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Only city admins can update requests',
         })
       }
 
+      // Get the request details first
+      const { data: existingRequest, error: fetchError } = await ctx.supabase
+        .from('city_requests')
+        .select('*')
+        .eq('id', input.requestId)
+        .single()
+
+      if (fetchError || !existingRequest) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'City request not found',
+        })
+      }
+
+      // If approving, create the city and make requester admin
+      let createdCity = null
+      if (input.status === 'approved') {
+        // Generate slug from city name
+        const slug = existingRequest.city_name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+
+        // Check if slug already exists
+        const { data: existingCity } = await ctx.supabase
+          .from('cities')
+          .select('id')
+          .eq('slug', slug)
+          .single()
+
+        if (existingCity) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: `A city with slug "${slug}" already exists`,
+          })
+        }
+
+        // Create the new city
+        const { data: newCity, error: cityError } = await ctx.supabase
+          .from('cities')
+          .insert({
+            name: existingRequest.city_name,
+            slug,
+            country: existingRequest.country,
+            is_active: true,
+            platform_fee_percent: 10, // Default 10%
+          })
+          .select()
+          .single()
+
+        if (cityError) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to create city',
+            cause: cityError,
+          })
+        }
+
+        createdCity = newCity
+
+        // If requester was logged in, make them the city admin
+        if (existingRequest.profile_id) {
+          const { error: adminError } = await ctx.supabase
+            .from('city_admins')
+            .insert({
+              city_id: newCity.id,
+              profile_id: existingRequest.profile_id,
+              role: 'owner',
+            })
+
+          if (adminError) {
+            console.error('Failed to create city admin:', adminError)
+            // Don't fail the whole request, city is created
+          }
+        }
+      }
+
+      // Update the request status
       const { data: request, error } = await ctx.supabase
         .from('city_requests')
         .update({
@@ -273,6 +354,9 @@ export const citiesRouter = createTRPCRouter({
         })
       }
 
-      return request
+      return {
+        ...request,
+        createdCity,
+      }
     }),
 })

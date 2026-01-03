@@ -19,6 +19,31 @@ const publicCitySlugs = ['mallorca', 'mazunte']
 // put the authentication routes here - these will only be accessed by guests
 const authRoutes = ['/sign-in', '/sign-up', '/reset-password']
 
+// Base domain for subdomain routing (e.g., 'connection.ink')
+const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'localhost:3000'
+
+// Helper to extract city slug from subdomain
+function getCityFromSubdomain(hostname: string): string | null {
+  // Remove port if present
+  const host = hostname.split(':')[0]
+
+  // Skip for localhost without subdomain
+  if (host === 'localhost' || host === '127.0.0.1') return null
+
+  // Extract subdomain from hostname
+  // e.g., mallorca.connection.ink -> mallorca
+  const baseDomainWithoutPort = BASE_DOMAIN.split(':')[0]
+  if (host.endsWith(baseDomainWithoutPort)) {
+    const subdomain = host.replace(`.${baseDomainWithoutPort}`, '')
+    // Check if it's a valid city slug (not 'www' or empty)
+    if (subdomain && subdomain !== 'www' && subdomain !== baseDomainWithoutPort) {
+      return subdomain
+    }
+  }
+
+  return null
+}
+
 // Helper to check if a path is a public city route
 function isPublicCityRoute(pathname: string): boolean {
   const segments = pathname.split('/').filter(Boolean)
@@ -29,6 +54,35 @@ function isPublicCityRoute(pathname: string): boolean {
 }
 
 export async function middleware(req: NextRequest) {
+  const hostname = req.headers.get('host') || ''
+  const cityFromSubdomain = getCityFromSubdomain(hostname)
+
+  // If accessing via subdomain (e.g., mallorca.connection.ink)
+  // Rewrite to the city path (e.g., /mallorca)
+  if (cityFromSubdomain) {
+    const pathname = req.nextUrl.pathname
+
+    // Don't rewrite if already on a city path or special routes
+    if (!pathname.startsWith(`/${cityFromSubdomain}`) &&
+        !pathname.startsWith('/api') &&
+        !pathname.startsWith('/_next') &&
+        !pathname.startsWith('/sign-in') &&
+        !pathname.startsWith('/sign-up') &&
+        !pathname.startsWith('/practitioner') &&
+        !pathname.startsWith('/admin') &&
+        !pathname.startsWith('/settings')) {
+
+      // Rewrite / to /[city] and /practitioners to /[city]/practitioners etc.
+      const newPath = pathname === '/'
+        ? `/${cityFromSubdomain}`
+        : `/${cityFromSubdomain}${pathname}`
+
+      const url = req.nextUrl.clone()
+      url.pathname = newPath
+      return NextResponse.rewrite(url)
+    }
+  }
+
   // we need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
 

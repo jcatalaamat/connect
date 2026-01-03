@@ -32,18 +32,18 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<TimeFilter | null>(null)
 
-  // Use prop citySlug or fall back to context city
+  // URL/prop always takes precedence over stored context
   const effectiveCitySlug = propCitySlug || city?.slug
 
-  // If we have a citySlug prop but no city in context, fetch and set the city
+  // Fetch city data when we have a citySlug from URL
   const { data: cityData } = api.cities.getBySlug.useQuery(
     { slug: propCitySlug! },
-    { enabled: !!propCitySlug && (!city || city.slug !== propCitySlug) }
+    { enabled: !!propCitySlug }
   )
 
-  // Set city in context when loaded from URL
+  // Always update context when URL city differs from stored city
   useEffect(() => {
-    if (cityData && (!city || city.slug !== cityData.slug)) {
+    if (cityData && city?.slug !== cityData.slug) {
       setCity({
         id: cityData.id,
         slug: cityData.slug,
@@ -51,7 +51,7 @@ export function BrowseScreen({ citySlug: propCitySlug }: BrowseScreenProps = {})
         country: cityData.country,
       })
     }
-  }, [cityData, city, setCity])
+  }, [cityData, city?.slug, setCity])
 
   // Get events for selected city
   const { data: eventsData, isLoading: eventsLoading } = api.offerings.listByCity.useQuery(

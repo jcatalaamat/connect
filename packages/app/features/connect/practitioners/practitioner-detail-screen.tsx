@@ -1,3 +1,4 @@
+import { ScrollView } from 'react-native'
 import {
   YStack,
   XStack,
@@ -68,11 +69,8 @@ export function PractitionerDetailScreen({
   }
 
   return (
-    <YStack flex={1} padding="$4" gap="$6">
-      {/* Back Button */}
-      <XStack>
-        <Button icon={ArrowLeft} circular variant="outlined" onPress={() => router.back()} />
-      </XStack>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <YStack flex={1} padding="$4" gap="$6">
 
       {/* Header */}
       <XStack gap="$4" alignItems="flex-start">
@@ -224,6 +222,7 @@ export function PractitionerDetailScreen({
           </Paragraph>
         </Card>
       )}
-    </YStack>
+      </YStack>
+    </ScrollView>
   )
 }

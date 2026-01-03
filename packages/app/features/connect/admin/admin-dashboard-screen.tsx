@@ -32,15 +32,23 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
   )
 
   // Get city requests (pending by default)
-  const { data: cityRequests, isLoading: loadingRequests, refetch: refetchRequests } = api.cities.listRequests.useQuery(
+  const { data: cityRequests, isLoading: loadingRequests, error: requestsError, refetch: refetchRequests } = api.cities.listRequests.useQuery(
     { status: showAllRequests ? undefined : 'pending', limit: 10 },
     { enabled: !!adminCities && adminCities.length > 0 }
   )
 
+  // Also refetch cities list when a request is approved
+  const citiesQuery = api.cities.list.useQuery()
+
   // Mutation to update request status
   const updateRequestMutation = api.cities.updateRequestStatus.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       refetchRequests()
+      // Refetch cities list if a new city was created
+      if (data.createdCity) {
+        citiesQuery.refetch()
+        alert(`City "${data.createdCity.name}" has been created! The requester is now the city admin.`)
+      }
     },
   })
 
@@ -245,7 +253,15 @@ export function AdminDashboardScreen({ citySlug }: { citySlug: string }) {
           </Button>
         </XStack>
 
-        {loadingRequests ? (
+        {requestsError ? (
+          <Card bordered padding="$4" backgroundColor="$red2">
+            <YStack gap="$2">
+              <Text fontWeight="600" color="$red10">Failed to load city requests</Text>
+              <Text size="$2" theme="alt2">{requestsError.message}</Text>
+              <Button size="$2" onPress={() => refetchRequests()}>Retry</Button>
+            </YStack>
+          </Card>
+        ) : loadingRequests ? (
           <XStack justifyContent="center" padding="$4">
             <Spinner />
           </XStack>

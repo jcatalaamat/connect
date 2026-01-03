@@ -77,13 +77,121 @@ export default function HomeLayout() {
             <Stack.Screen
               name="create"
               options={{
-                headerShown: false,
+                headerShown: true,
+                title: 'New Offering',
+                headerBackTitle: 'Back',
               }}
             />
             <Stack.Screen
               name="settings/index"
               options={{
                 headerShown: true,
+                headerBackTitle: 'Back',
+              }}
+            />
+            {/* Practitioner dashboard screens */}
+            <Stack.Screen
+              name="practitioner/dashboard/offerings/index"
+              options={{
+                headerShown: true,
+                title: 'My Offerings',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/dashboard/offerings/new"
+              options={{
+                headerShown: true,
+                title: 'New Offering',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/dashboard/offerings/[id]/index"
+              options={{
+                headerShown: true,
+                title: 'Offering Details',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/dashboard/offerings/[id]/edit"
+              options={{
+                headerShown: true,
+                title: 'Edit Offering',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/dashboard/bookings/index"
+              options={{
+                headerShown: true,
+                title: 'My Bookings',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/dashboard/bookings/[id]"
+              options={{
+                headerShown: true,
+                title: 'Booking Details',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/stripe-setup"
+              options={{
+                headerShown: true,
+                title: 'Stripe Setup',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="practitioner/onboarding"
+              options={{
+                headerShown: true,
+                title: 'Become a Practitioner',
+                headerBackTitle: 'Back',
+              }}
+            />
+            {/* Public city/practitioner pages */}
+            <Stack.Screen
+              name="[city]/[practitioner]/index"
+              options={{
+                headerShown: true,
+                title: 'Practitioner',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="[city]/[practitioner]/[offering]"
+              options={{
+                headerShown: true,
+                title: 'Offering',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="book/[offeringId]"
+              options={{
+                headerShown: true,
+                title: 'Book',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="booking/lookup"
+              options={{
+                headerShown: true,
+                title: 'Find Booking',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="booking/confirmation/[code]"
+              options={{
+                headerShown: true,
+                title: 'Booking Confirmed',
                 headerBackTitle: 'Back',
               }}
             />
