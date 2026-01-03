@@ -9,6 +9,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
+import { useRouter } from 'solito/navigation'
 
 export function DrawerMenu(props) {
   const { profile, avatarUrl, session } = useUser()
@@ -16,6 +17,7 @@ export function DrawerMenu(props) {
   const { isPractitioner, isAdmin, isAuthenticated, adminCitySlug } = useUserRole()
   const supabase = useSupabase()
   const navigation = useNavigation()
+  const router = useRouter()
   const name = profile?.name
   const insets = useSafeAreaInsets()
   const height = useWindowDimensions().height
@@ -29,6 +31,7 @@ export function DrawerMenu(props) {
   const profileEditLink = useLink({ href: '/profile/edit' })
   const settingsLink = useLink({ href: '/settings' })
   const signInLink = useLink({ href: '/sign-in' })
+  const changeCityLink = useLink({ href: '/city-select' })
 
   const handleLogout = () => {
     supabase.auth.signOut()
@@ -45,7 +48,8 @@ export function DrawerMenu(props) {
     } catch (e) {
       // Drawer close failed, continue anyway
     }
-    clearCity()
+    // Navigate to city selector
+    router.push('/city-select')
   }
 
   return (

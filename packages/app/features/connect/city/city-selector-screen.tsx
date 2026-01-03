@@ -1,8 +1,8 @@
-import { YStack, XStack, H1, H2, Text, Card, Spinner, Image, Input } from '@my/ui'
-import { Search } from '@tamagui/lucide-icons'
+import { YStack, XStack, H1, H2, H3, Text, Card, Spinner, Image, Input, Button, Paragraph, Sheet } from '@my/ui'
+import { Search, MapPin, Plus, X } from '@tamagui/lucide-icons'
 import { api } from 'app/utils/api'
 import { useCity } from 'app/provider/city'
-import { Platform } from 'react-native'
+import { Platform, ScrollView } from 'react-native'
 import { useRouter } from 'solito/navigation'
 import { useState, useMemo } from 'react'
 
@@ -16,6 +16,7 @@ function CityCard({
   description,
   practitionerCount,
   onSelect,
+  isCurrentCity,
 }: {
   id: string
   name: string
@@ -25,6 +26,7 @@ function CityCard({
   description?: string | null
   practitionerCount?: number
   onSelect: () => void
+  isCurrentCity?: boolean
 }) {
   return (
     <Card
@@ -39,6 +41,8 @@ function CityCard({
       width={320}
       minHeight={180}
       overflow="hidden"
+      borderColor={isCurrentCity ? '$green8' : undefined}
+      borderWidth={isCurrentCity ? 2 : 1}
     >
       {coverImageUrl && (
         <Card.Background>
@@ -53,15 +57,22 @@ function CityCard({
         </Card.Background>
       )}
       <Card.Header padded>
-        <H2 size="$8">{name}</H2>
-        <Text theme="alt2" size="$4">
-          {country}
-        </Text>
+        <XStack justifyContent="space-between" alignItems="flex-start">
+          <YStack>
+            <H2 size="$8">{name}</H2>
+            <Text theme="alt2" size="$4">
+              {country}
+            </Text>
+          </YStack>
+          {isCurrentCity && (
+            <Button size="$2" theme="green" disabled circular icon={MapPin} />
+          )}
+        </XStack>
       </Card.Header>
       <Card.Footer padded>
         <YStack gap="$2" width="100%">
           {description && (
-            <Text size="$3" flexWrap="wrap" flexShrink={1}>
+            <Text size="$3" flexWrap="wrap" flexShrink={1} numberOfLines={2}>
               {description}
             </Text>
           )}
@@ -76,11 +87,109 @@ function CityCard({
   )
 }
 
+// Request City Sheet component
+function RequestCitySheet({
+  open,
+  onOpenChange,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const [cityName, setCityName] = useState('')
+  const [country, setCountry] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleSubmit = () => {
+    // In production, this would send to an API
+    console.log('City request:', { cityName, country })
+    setSubmitted(true)
+  }
+
+  const handleClose = () => {
+    onOpenChange(false)
+    // Reset after animation
+    setTimeout(() => {
+      setCityName('')
+      setCountry('')
+      setSubmitted(false)
+    }, 300)
+  }
+
+  return (
+    <Sheet
+      modal
+      open={open}
+      onOpenChange={onOpenChange}
+      snapPoints={[50]}
+      dismissOnSnapToBottom
+    >
+      <Sheet.Overlay />
+      <Sheet.Frame padding="$4" gap="$4">
+        <Sheet.Handle />
+        <XStack justifyContent="space-between" alignItems="center">
+          <H3>Request a City</H3>
+          <Button size="$3" circular icon={X} onPress={handleClose} chromeless />
+        </XStack>
+
+        {submitted ? (
+          <YStack gap="$4" alignItems="center" paddingVertical="$6">
+            <MapPin size={48} color="$green10" />
+            <Text size="$5" fontWeight="600" textAlign="center">
+              Thanks for your request!
+            </Text>
+            <Paragraph textAlign="center" theme="alt2">
+              We'll review {cityName} and let you know when it's available.
+            </Paragraph>
+            <Button onPress={handleClose} theme="green">
+              Done
+            </Button>
+          </YStack>
+        ) : (
+          <YStack gap="$4">
+            <Paragraph theme="alt2">
+              Don't see your city? Let us know where you'd like to see wellness practitioners.
+            </Paragraph>
+
+            <YStack gap="$2">
+              <Text size="$2" fontWeight="600">City name</Text>
+              <Input
+                size="$4"
+                placeholder="e.g. Barcelona"
+                value={cityName}
+                onChangeText={setCityName}
+              />
+            </YStack>
+
+            <YStack gap="$2">
+              <Text size="$2" fontWeight="600">Country</Text>
+              <Input
+                size="$4"
+                placeholder="e.g. Spain"
+                value={country}
+                onChangeText={setCountry}
+              />
+            </YStack>
+
+            <Button
+              theme="green"
+              disabled={!cityName.trim() || !country.trim()}
+              onPress={handleSubmit}
+            >
+              Submit Request
+            </Button>
+          </YStack>
+        )}
+      </Sheet.Frame>
+    </Sheet>
+  )
+}
+
 export function CitySelectorScreen() {
   const { data: cities, isLoading, error } = api.cities.list.useQuery()
-  const { setCity } = useCity()
+  const { city: currentCity, setCity } = useCity()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
+  const [requestSheetOpen, setRequestSheetOpen] = useState(false)
 
   // Filter cities based on search query
   const filteredCities = useMemo(() => {
@@ -94,9 +203,6 @@ export function CitySelectorScreen() {
         city.country.toLowerCase().includes(query)
     )
   }, [cities, searchQuery])
-
-  // Show search when there are many cities
-  const showSearch = cities && cities.length > 6
 
   const handleSelectCity = (city: { id: string; slug: string; name: string; country: string }) => {
     setCity(city)
@@ -145,25 +251,30 @@ export function CitySelectorScreen() {
           Choose your city
         </Text>
 
-        {showSearch && (
-          <XStack
-            width="100%"
-            paddingHorizontal="$4"
-            alignItems="center"
-            gap="$2"
-          >
-            <Input
-              flex={1}
-              size="$4"
-              placeholder="Search cities..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <Search size={20} color="$gray10" />
-          </XStack>
-        )}
+        <XStack
+          width="100%"
+          paddingHorizontal="$4"
+          alignItems="center"
+          gap="$2"
+          backgroundColor="$background"
+          borderRadius="$4"
+          borderWidth={1}
+          borderColor="$borderColor"
+          paddingVertical="$2"
+        >
+          <Search size={20} color="$gray10" />
+          <Input
+            flex={1}
+            size="$4"
+            placeholder="Search cities..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+            borderWidth={0}
+            backgroundColor="transparent"
+          />
+        </XStack>
       </YStack>
 
       <XStack
@@ -181,6 +292,7 @@ export function CitySelectorScreen() {
             country={city.country}
             coverImageUrl={city.cover_image_url}
             description={city.description}
+            isCurrentCity={currentCity?.id === city.id}
             onSelect={() => handleSelectCity({
               id: city.id,
               slug: city.slug,
@@ -192,8 +304,15 @@ export function CitySelectorScreen() {
       </XStack>
 
       {filteredCities.length === 0 && searchQuery && (
-        <YStack alignItems="center" padding="$8">
+        <YStack alignItems="center" padding="$8" gap="$4">
           <Text theme="alt2">No cities match "{searchQuery}"</Text>
+          <Button
+            icon={Plus}
+            theme="green"
+            onPress={() => setRequestSheetOpen(true)}
+          >
+            Request this city
+          </Button>
         </YStack>
       )}
 
@@ -202,6 +321,23 @@ export function CitySelectorScreen() {
           <Text theme="alt2">No cities available yet</Text>
         </YStack>
       )}
+
+      {/* Request City Button - always visible at bottom */}
+      <YStack alignItems="center" paddingVertical="$4">
+        <Button
+          icon={Plus}
+          variant="outlined"
+          onPress={() => setRequestSheetOpen(true)}
+        >
+          Don't see your city? Request it
+        </Button>
+      </YStack>
+
+      {/* Request City Sheet */}
+      <RequestCitySheet
+        open={requestSheetOpen}
+        onOpenChange={setRequestSheetOpen}
+      />
     </YStack>
   )
 }
