@@ -1,5 +1,6 @@
 import { Avatar, Button, Paragraph, Separator, Settings, Text, XStack, YStack, getTokens, useWindowDimensions } from '@my/ui'
-import { DrawerContentScrollView } from '@react-navigation/drawer'
+import { DrawerContentScrollView, DrawerActions } from '@react-navigation/drawer'
+import { useNavigation } from '@react-navigation/native'
 import { Briefcase, CalendarCheck, Cog, Compass, LogIn, LogOut, MapPin, Shield, User, UserPlus } from '@tamagui/lucide-icons'
 import { useCity } from 'app/provider/city'
 import { useUserRole } from 'app/hooks'
@@ -14,6 +15,7 @@ export function DrawerMenu(props) {
   const { city, clearCity } = useCity()
   const { isPractitioner, isAdmin, isAuthenticated, adminCitySlug } = useUserRole()
   const supabase = useSupabase()
+  const navigation = useNavigation()
   const name = profile?.name
   const insets = useSafeAreaInsets()
   const height = useWindowDimensions().height
@@ -30,6 +32,11 @@ export function DrawerMenu(props) {
 
   const handleLogout = () => {
     supabase.auth.signOut()
+  }
+
+  const handleChangeCity = () => {
+    navigation.dispatch(DrawerActions.closeDrawer())
+    clearCity()
   }
 
   return (
@@ -121,7 +128,7 @@ export function DrawerMenu(props) {
                   {city && (
                     <Settings.Item
                       icon={MapPin}
-                      onPress={clearCity}
+                      onPress={handleChangeCity}
                     >
                       Change City
                     </Settings.Item>
@@ -146,7 +153,7 @@ export function DrawerMenu(props) {
                   {city && (
                     <Settings.Item
                       icon={MapPin}
-                      onPress={clearCity}
+                      onPress={handleChangeCity}
                     >
                       Change City
                     </Settings.Item>

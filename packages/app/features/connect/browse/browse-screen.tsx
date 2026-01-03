@@ -6,6 +6,7 @@ import { useRouter } from 'solito/navigation'
 import { api } from 'app/utils/api'
 import { useCity } from 'app/provider/city'
 import { Search, Calendar, Briefcase, Users } from '@tamagui/lucide-icons'
+import { CitySelectorScreen } from '../city/city-selector-screen'
 
 type TabValue = 'events' | 'services' | 'practitioners'
 
@@ -91,16 +92,9 @@ export function BrowseScreen() {
     (activeTab === 'services' && servicesLoading) ||
     (activeTab === 'practitioners' && practitionersLoading)
 
-  // If no city selected, show a message directing to city selector
+  // If no city selected, show the city selector
   if (!city) {
-    return (
-      <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$4">
-        <Text size="$5" textAlign="center">Select a city to browse</Text>
-        <Text theme="alt2" textAlign="center">
-          Tap the logo in the header to choose your city
-        </Text>
-      </YStack>
-    )
+    return <CitySelectorScreen />
   }
 
   const searchPlaceholder =
