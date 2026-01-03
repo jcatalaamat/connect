@@ -43,24 +43,6 @@ export function DrawerMenu(props) {
         py="$4"
         pb="$2"
       >
-        {/* City Selection */}
-        {city && (
-          <YStack paddingHorizontal="$4" paddingBottom="$4">
-            <XStack alignItems="center" gap="$2">
-              <MapPin size={16} color="$gray10" />
-              <Text size="$3" theme="alt2">{city.name}, {city.country}</Text>
-            </XStack>
-            <Button
-              size="$2"
-              marginTop="$2"
-              variant="outlined"
-              onPress={clearCity}
-            >
-              Change City
-            </Button>
-          </YStack>
-        )}
-
         <Separator marginBottom="$2" />
 
         <Settings>
@@ -136,6 +118,14 @@ export function DrawerMenu(props) {
                   <Settings.Item {...settingsLink} icon={Cog}>
                     Settings
                   </Settings.Item>
+                  {city && (
+                    <Settings.Item
+                      icon={MapPin}
+                      onPress={clearCity}
+                    >
+                      Change City
+                    </Settings.Item>
+                  )}
                   <Settings.Item
                     icon={LogOut}
                     onPress={handleLogout}
@@ -145,13 +135,23 @@ export function DrawerMenu(props) {
                   </Settings.Item>
                 </>
               ) : (
-                <Settings.Item
-                  icon={LogIn}
-                  {...signInLink}
-                  accentTheme="blue"
-                >
-                  Sign In
-                </Settings.Item>
+                <>
+                  <Settings.Item
+                    icon={LogIn}
+                    {...signInLink}
+                    accentTheme="blue"
+                  >
+                    Sign In
+                  </Settings.Item>
+                  {city && (
+                    <Settings.Item
+                      icon={MapPin}
+                      onPress={clearCity}
+                    >
+                      Change City
+                    </Settings.Item>
+                  )}
+                </>
               )}
             </Settings.Group>
           </Settings.Items>

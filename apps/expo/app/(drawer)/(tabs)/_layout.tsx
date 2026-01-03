@@ -4,26 +4,21 @@ import { Compass, Menu, CalendarCheck, Briefcase, Shield, User } from '@tamagui/
 import { Stack, Tabs, useNavigation } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useUserRole } from 'app/hooks'
-import { useCity } from 'app/provider/city'
 
 export default function Layout() {
   const { accentColor } = useTheme()
   const navigation = useNavigation()
   const insets = useSafeAreaInsets()
   const { isPractitioner, isAdmin, adminCitySlug } = useUserRole()
-  const { city } = useCity()
 
   // Show admin tab if user is admin for any city
   const showAdminTab = isAdmin && !!adminCitySlug
-
-  // Header title shows city name when selected
-  const headerTitle = city ? city.name : 'Connect'
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: headerTitle,
+          title: 'Connect',
           headerShown: true,
           headerTintColor: accentColor.val,
           headerLeft: () => (

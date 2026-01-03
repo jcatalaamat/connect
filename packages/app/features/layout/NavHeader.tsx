@@ -1,6 +1,6 @@
 import { XStack, YStack, H3, Button, Text, Sheet, Separator } from '@my/ui'
 import { useRouter } from 'solito/navigation'
-import { Menu, X, Compass, CalendarCheck, User, Briefcase, Shield, LogIn, UserPlus, Settings, MapPin, ChevronDown } from '@tamagui/lucide-icons'
+import { Menu, X, Compass, CalendarCheck, User, Briefcase, Shield, LogIn, UserPlus, Settings } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { useCity } from 'app/provider/city'
@@ -157,22 +157,6 @@ export function NavHeader() {
               </Button>
             ))}
           </YStack>
-          {city && (
-            <>
-              <Separator />
-              <Button
-                size="$4"
-                variant="outlined"
-                onPress={() => {
-                  setMenuOpen(false)
-                  clearCity()
-                  router.push('/')
-                }}
-              >
-                Change City
-              </Button>
-            </>
-          )}
           {isAuthenticated && (
             <>
               <Separator />
@@ -202,15 +186,13 @@ export function NavHeader() {
         style: { position: 'sticky' as any },
       })}
     >
-      {/* Logo / City selector */}
+      {/* Logo */}
       <Button
         chromeless
         onPress={handleLogoClick}
         paddingHorizontal="$2"
-        icon={city ? <MapPin size={18} /> : undefined}
-        iconAfter={city ? <ChevronDown size={14} color="$gray10" /> : undefined}
       >
-        <H3 fontWeight="700">{city ? city.name : 'Connect'}</H3>
+        <H3 fontWeight="700">Connect</H3>
       </Button>
 
       {/* Navigation */}
